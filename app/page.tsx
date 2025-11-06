@@ -10,6 +10,7 @@ import { FilterBar } from "@/components/dashboard/filter-bar"
 import { StartupsTable } from "@/components/dashboard/startups-table"
 import { DataQualitySection } from "@/components/dashboard/data-quality-section"
 import { CrawlerSimulation } from "@/components/crawler-simulation"
+import { FeedbackButton } from "@/components/feedback-modal"
 import Image from "next/image"
 
 export default function DashboardPage() {
@@ -158,6 +159,9 @@ export default function DashboardPage() {
       </div>
 
       <CrawlerSimulation isOpen={showCrawlerSimulation} onClose={() => setShowCrawlerSimulation(false)} />
+      
+      {/* Feedback Button - Fixed Bottom Right */}
+      <FeedbackButton />
     </div>
   )
 }
