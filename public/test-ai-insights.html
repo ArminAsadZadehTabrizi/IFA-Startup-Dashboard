@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Insights API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .success { color: green; }
+        .error { color: red; }
+        .insight-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+        button {
+            background: #6366f1;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #4f46e5;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 AI Insights API Test</h1>
+    <p>This page tests if the AI insights API is working correctly.</p>
+    
+    <button onclick="testAPI()">Test API Connection</button>
+    
+    <div id="results"></div>
+
+    <script>
+        async function testAPI() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>Testing...</p>';
+            
+            try {
+                // Test 1: Get all insights
+                const response = await fetch('/api/ai-insights');
+                const data = await response.json();
+                
+                let html = `
+                    <h2 class="success">✅ API is working!</h2>
+                    <p><strong>Total insights:</strong> ${data.total}</p>
+                `;
+                
+                if (data.insights && data.insights.length > 0) {
+                    html += '<h3>📋 Available Insights:</h3>';
+                    
+                    for (let insight of data.insights) {
+                        html += `
+                            <div class="insight-card">
+                                <h4>🚀 ${insight.startup_name}</h4>
+                                <p><strong>Status:</strong> ${insight.status}</p>
+                                <p><strong>Recommendation:</strong> ${insight.ai_analysis.recommendation.toUpperCase()}</p>
+                                <p><strong>Confidence:</strong> ${Math.round(insight.ai_analysis.confidence_score * 100)}%</p>
+                                <p><strong>Updates:</strong> ${insight.updates.length}</p>
+                                <p><em>${insight.ai_analysis.summary}</em></p>
+                            </div>
+                        `;
+                    }
+                    
+                    html += `
+                        <hr>
+                        <h3>✅ Frontend Integration Status:</h3>
+                        <ul>
+                            <li>✅ API endpoint working</li>
+                            <li>✅ ${data.total} insights stored</li>
+                            <li>✅ Data structure correct</li>
+                        </ul>
+                        <p><strong>If you don't see insights in the dashboard:</strong></p>
+                        <ol>
+                            <li>Hard refresh the page: <code>Cmd + Shift + R</code> (Mac) or <code>Ctrl + Shift + R</code> (Windows)</li>
+                            <li>Clear browser cache</li>
+                            <li>Check browser console for errors (F12)</li>
+                        </ol>
+                    `;
+                } else {
+                    html += '<p class="error">❌ No insights found in API</p>';
+                }
+                
+                results.innerHTML = html;
+                
+            } catch (error) {
+                results.innerHTML = `
+                    <h2 class="error">❌ API Error</h2>
+                    <p>${error.message}</p>
+                `;
+            }
+        }
+        
+        // Auto-test on page load
+        window.onload = testAPI;
+    </script>
+</body>
+</html>
+
+
+

@@ -1,0 +1,98 @@
+[
+  {
+    "id": 1,
+    "name": "Keine Armut"
+  },
+  {
+    "id": 2,
+    "name": "Kein Hunger"
+  },
+  {
+    "id": 3,
+    "name": "Gesundheit & Wohlergehen"
+  },
+  {
+    "id": 4,
+    "name": "Hochwertige Bildung"
+  },
+  {
+    "id": 5,
+    "name": "Geschlechtergleichheit"
+  },
+  {
+    "id": 6,
+    "name": "Sauberes Wasser & Sanitäreinrichtungen"
+  },
+  {
+    "id": 7,
+    "name": "Bezahlbare & saubere Energie"
+  },
+  {
+    "id": 8,
+    "name": "Menschenwürdige Arbeit und Wirtschaftswachstum"
+  },
+  {
+    "id": 9,
+    "name": "Industrie, Innovation & Infrastruktur"
+  },
+  {
+    "id": 10,
+    "name": "Weniger Ungleichheiten"
+  },
+  {
+    "id": 11,
+    "name": "Nachhaltige Städte & Gemeinden"
+  },
+  {
+    "id": 12,
+    "name": "Nachhaltiger Konsum & Produktion"
+  },
+  {
+    "id": 13,
+    "name": "Maßnahmen zum Klimaschutz"
+  },
+  {
+    "id": 14,
+    "name": "Leben unter Wasser"
+  },
+  {
+    "id": 15,
+    "name": "Leben an Land"
+  },
+  {
+    "id": 16,
+    "name": "Frieden, Gerechtigkeit & starke Institutionen"
+  },
+  {
+    "id": 17,
+    "name": "Partnerschaften zur Erreichung der Ziele"
+  },
+  {
+    "id": 101,
+    "name": "Kreislaufwirtschaft"
+  },
+  {
+    "id": 102,
+    "name": "Klimaschutz & erneuerbare Energien"
+  },
+  {
+    "id": 103,
+    "name": "Gesundheit & Pflege"
+  },
+  {
+    "id": 104,
+    "name": "Demokratie & resiliente Gesellschaft"
+  },
+  {
+    "id": 105,
+    "name": "Bildung & Inklusion"
+  },
+  {
+    "id": 106,
+    "name": "Lebenswerte Städte & Mobilität"
+  },
+  {
+    "id": 107,
+    "name": "Ernährung & nachhaltige Landwirtschaft"
+  }
+]

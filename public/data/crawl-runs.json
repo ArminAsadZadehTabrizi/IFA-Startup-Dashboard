@@ -1,0 +1,86 @@
+[
+  {
+    "id": "run-batch1-005",
+    "startedAt": "2025-09-05T05:00:00Z",
+    "finishedAt": "2025-09-05T05:18:42Z",
+    "status": "success",
+    "totalTargets": 10,
+    "scanned": 9,
+    "updated": 7,
+    "errors": 0,
+    "durationSec": 1122,
+    "sources": [
+      "website",
+      "linkedin",
+      "news"
+    ],
+    "message": "Batch 1 Startups erfolgreich gecrawlt"
+  },
+  {
+    "id": "run-batch1-004",
+    "startedAt": "2025-09-04T05:00:00Z",
+    "finishedAt": "2025-09-04T05:22:10Z",
+    "status": "partial",
+    "totalTargets": 10,
+    "scanned": 8,
+    "updated": 5,
+    "errors": 2,
+    "durationSec": 1320,
+    "sources": [
+      "website",
+      "linkedin",
+      "news"
+    ],
+    "message": "ETAROB und adiutaByte rate-limited"
+  },
+  {
+    "id": "run-batch1-003",
+    "startedAt": "2025-09-03T05:00:00Z",
+    "finishedAt": "2025-09-03T05:25:00Z",
+    "status": "success",
+    "totalTargets": 10,
+    "scanned": 9,
+    "updated": 4,
+    "errors": 0,
+    "durationSec": 1500,
+    "sources": [
+      "website",
+      "linkedin"
+    ],
+    "message": "Batch 1 Routine-Crawl erfolgreich"
+  },
+  {
+    "id": "run-batch1-002",
+    "startedAt": "2025-09-02T05:00:00Z",
+    "finishedAt": "2025-09-02T05:24:03Z",
+    "status": "failed",
+    "totalTargets": 10,
+    "scanned": 0,
+    "updated": 0,
+    "errors": 10,
+    "durationSec": 1440,
+    "sources": [
+      "website",
+      "linkedin",
+      "news"
+    ],
+    "message": "Proxy-Server temporär nicht verfügbar"
+  },
+  {
+    "id": "run-batch1-001",
+    "startedAt": "2025-09-01T05:00:00Z",
+    "finishedAt": "2025-09-01T05:18:00Z",
+    "status": "success",
+    "totalTargets": 10,
+    "scanned": 9,
+    "updated": 6,
+    "errors": 0,
+    "durationSec": 1080,
+    "sources": [
+      "website",
+      "linkedin",
+      "news"
+    ],
+    "message": "Erster Crawl von Batch 1 Startups"
+  }
+]
