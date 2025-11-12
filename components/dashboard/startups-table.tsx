@@ -24,6 +24,7 @@ export function StartupsTable({ startups, sdgs, filters, searchQuery }: Startups
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedContact, setSelectedContact] = useState<{ name: string; email?: string; phone?: string; title?: string } | null>(null)
   const [isContactModalOpen, setIsContactModalOpen] = useState(false)
+  const [isStartupColumnFixed, setIsStartupColumnFixed] = useState(true)
 
   const filteredStartups = useMemo(() => {
     return startups.filter((startup) => {
@@ -102,6 +103,15 @@ export function StartupsTable({ startups, sdgs, filters, searchQuery }: Startups
                 </Button>
               </div>
             )}
+            <label className="flex items-center gap-2 text-sm cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isStartupColumnFixed}
+                onChange={(e) => setIsStartupColumnFixed(e.target.checked)}
+                className="rounded"
+              />
+              Spalte fixieren
+            </label>
             <Button size="sm" variant="outline">
               CSV exportieren
             </Button>
@@ -109,11 +119,11 @@ export function StartupsTable({ startups, sdgs, filters, searchQuery }: Startups
         </div>
       </CardHeader>
       <CardContent>
-        <div className="rounded-md border">
+        <div className="rounded-md border relative overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead className="w-12">
+              <TableRow className={isStartupColumnFixed ? 'relative' : ''}>
+                <TableHead className={`w-12 ${isStartupColumnFixed ? 'sticky left-0 z-30 bg-white dark:bg-gray-950 border-r after:absolute after:right-0 after:top-0 after:bottom-0 after:w-px after:bg-border' : ''}`}>
                   <input
                     type="checkbox"
                     className="rounded"
@@ -126,8 +136,16 @@ export function StartupsTable({ startups, sdgs, filters, searchQuery }: Startups
                     }}
                   />
                 </TableHead>
-                <TableHead>Startup</TableHead>
-                <TableHead>Batch</TableHead>
+                <TableHead className={`${isStartupColumnFixed ? 'sticky left-0 z-30 relative' : ''}`} style={isStartupColumnFixed ? { 
+                  backgroundColor: 'white',
+                  width: '220px',
+                  minWidth: '220px',
+                  paddingLeft: '60px',
+                  paddingRight: '24px',
+                  boxShadow: '4px 0 6px -1px rgba(0, 0, 0, 0.1)',
+                  borderRight: '1px solid #e5e7eb'
+                } : {}}>Startup</TableHead>
+                <TableHead className={isStartupColumnFixed ? 'pl-6' : ''}>Batch</TableHead>
                 <TableHead>Sektor</TableHead>
                 <TableHead>SDGs</TableHead>
                 <TableHead>Primary Contact</TableHead>
@@ -141,8 +159,8 @@ export function StartupsTable({ startups, sdgs, filters, searchQuery }: Startups
             </TableHeader>
             <TableBody>
               {filteredStartups.map((startup) => (
-                <TableRow key={startup.id}>
-                  <TableCell>
+                <TableRow key={startup.id} className={isStartupColumnFixed ? 'relative' : ''}>
+                  <TableCell className={isStartupColumnFixed ? 'sticky left-0 z-20 bg-white dark:bg-gray-950 border-r after:absolute after:right-0 after:top-0 after:bottom-0 after:w-px after:bg-border' : ''}>
                     <input
                       type="checkbox"
                       className="rounded"
@@ -156,21 +174,29 @@ export function StartupsTable({ startups, sdgs, filters, searchQuery }: Startups
                       }}
                     />
                   </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-8 w-8">
+                  <TableCell className={`${isStartupColumnFixed ? 'sticky left-0 z-20 relative' : ''}`} style={isStartupColumnFixed ? {
+                    backgroundColor: 'white',
+                    width: '220px',
+                    minWidth: '220px',
+                    paddingLeft: '60px',
+                    paddingRight: '24px',
+                    boxShadow: '4px 0 6px -1px rgba(0, 0, 0, 0.1)',
+                    borderRight: '1px solid #e5e7eb'
+                  } : {}}>
+                    <div className="flex items-center gap-2">
+                      <Avatar className="h-8 w-8 flex-shrink-0">
                         <AvatarImage src={startup.logoUrl || "/placeholder.svg"} alt={startup.name} />
                         <AvatarFallback>{startup.name.substring(0, 2).toUpperCase()}</AvatarFallback>
                       </Avatar>
-                      <div>
-                        <div className="font-medium">{startup.name}</div>
+                      <div className="min-w-0 flex-1">
+                        <div className="font-medium whitespace-nowrap">{startup.name}</div>
                         {startup.website && (
-                          <div className="text-sm text-muted-foreground">{startup.website.replace("https://", "")}</div>
+                          <div className="text-xs text-muted-foreground truncate">{startup.website.replace("https://", "").split('/')[0]}</div>
                         )}
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className={isStartupColumnFixed ? 'pl-6' : ''}>
                     <Badge variant="outline">{startup.batch}</Badge>
                   </TableCell>
                   <TableCell>

@@ -221,3 +221,4 @@ Dieses Projekt wurde vom lokalen Monorepo (`ifa-startup-dashboard`) getrennt, um
 **Version:** 1.0.0  
 **Erstellt:** November 2025
 
+

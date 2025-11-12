@@ -313,3 +313,4 @@ npm run build
 **Framework:** Next.js 14.2.16  
 **Ziel-Platform:** Vercel
 
+
