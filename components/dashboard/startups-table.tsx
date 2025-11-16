@@ -14,7 +14,17 @@ import { StartupDetailsModal } from "./startup-details-modal"
 interface StartupsTableProps {
   startups: Startup[]
   sdgs: SDG[]
-  filters: any
+  filters: {
+    batches: string[]
+    sectors: string[]
+    sdgs: number[]
+    statuses: string[]
+    cities: string[]
+    states: string[]
+    organizations: string[]
+    discrepancyRange: [number, number]
+    freshnessRange: [number, number]
+  }
   searchQuery: string
 }
 
@@ -24,54 +34,91 @@ export function StartupsTable({ startups, sdgs, filters, searchQuery }: Startups
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedContact, setSelectedContact] = useState<{ name: string; email?: string; phone?: string; title?: string } | null>(null)
   const [isContactModalOpen, setIsContactModalOpen] = useState(false)
-  const [isStartupColumnFixed, setIsStartupColumnFixed] = useState(true)
+  const [isStartupColumnFixed, setIsStartupColumnFixed] = useState(false)
 
   const filteredStartups = useMemo(() => {
-    return startups.filter((startup) => {
-      // Search filter
-      if (
-        searchQuery &&
-        !startup.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-        !startup.website?.toLowerCase().includes(searchQuery.toLowerCase())
-      ) {
+    let result = [...startups]
+    
+    // Apply search filter - search across name, sector, city, and primary contact name
+    if (searchQuery && searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim()
+      result = result.filter(startup => {
+        // Search in startup name
+        if (startup.name.toLowerCase().includes(query)) return true
+        
+        // Search in sector
+        if (startup.sector.toLowerCase().includes(query)) return true
+        
+        // Search in city
+        if (startup.city?.toLowerCase().includes(query)) return true
+        
+        // Search in state
+        if (startup.state?.toLowerCase().includes(query)) return true
+        
+        // Search in batch
+        if (startup.batch?.toLowerCase().includes(query)) return true
+        
+        // Search in primary contact name
+        if (startup.primaryContact?.name.toLowerCase().includes(query)) return true
+        
+        // Search in website
+        if (startup.website?.toLowerCase().includes(query)) return true
+        
         return false
-      }
-
-      // Batch filter
-      if (filters.batches.length > 0 && !filters.batches.includes(startup.batch || '')) {
-        return false
-      }
-
-      // Sector filter
-      if (filters.sectors.length > 0 && !filters.sectors.includes(startup.sector)) {
-        return false
-      }
-
-      // SDG filter - check if startup has any of the filtered SDGs
-      if (filters.sdgs.length > 0) {
-        const hasMatchingSdg = filters.sdgs.some(sdgId => startup.sdgs.includes(sdgId))
-        if (!hasMatchingSdg) {
-          return false
-        }
-      }
-
-      // Programmphase filter (using statuses array)
-      if (filters.statuses.length > 0 && !filters.statuses.includes(startup.programPhase || '')) {
-        return false
-      }
-
-      // City filter
-      if (filters.cities.length > 0 && !filters.cities.includes(startup.city || '')) {
-        return false
-      }
-
-      // State/Bundesland filter
-      if (filters.states && filters.states.length > 0 && !filters.states.includes(startup.state || '')) {
-        return false
-      }
-
-      return true
-    })
+      })
+    }
+    
+    // Apply batch filter
+    if (filters.batches?.length > 0) {
+      result = result.filter(startup => 
+        filters.batches.includes(startup.batch || '')
+      )
+    }
+    
+    // Apply sector filter
+    if (filters.sectors?.length > 0) {
+      result = result.filter(startup => 
+        filters.sectors.includes(startup.sector)
+      )
+    }
+    
+    // Apply SDG filter
+    if (filters.sdgs?.length > 0) {
+      result = result.filter(startup => 
+        filters.sdgs.some(sdgId => startup.sdgs.includes(sdgId))
+      )
+    }
+    
+    // Apply status/program phase filter
+    if (filters.statuses?.length > 0) {
+      result = result.filter(startup => 
+        filters.statuses.includes(startup.programPhase || '')
+      )
+    }
+    
+    // Apply city filter
+    if (filters.cities?.length > 0) {
+      result = result.filter(startup => 
+        filters.cities.includes(startup.city || '')
+      )
+    }
+    
+    // Apply state filter
+    if (filters.states?.length > 0) {
+      result = result.filter(startup => 
+        filters.states.includes(startup.state || '')
+      )
+    }
+    
+    // Apply organization filter - exact match
+    if (filters.organizations?.length > 0) {
+      result = result.filter(startup => {
+        const org = startup.organization?.trim() || ''
+        return filters.organizations.some(filterOrg => filterOrg.trim() === org)
+      })
+    }
+    
+    return result
   }, [startups, searchQuery, filters])
 
   const getSdgNames = (sdgIds: number[]) => {
@@ -88,11 +135,35 @@ export function StartupsTable({ startups, sdgs, filters, searchQuery }: Startups
     setSelectedStartup(null)
   }
 
+  // Build active filters summary
+  const activeFiltersSummary = []
+  if (searchQuery) activeFiltersSummary.push(`Suche: "${searchQuery}"`)
+  if (filters.batches.length > 0) activeFiltersSummary.push(`Batch: ${filters.batches.join(', ')}`)
+  if (filters.sectors.length > 0) activeFiltersSummary.push(`Sektor: ${filters.sectors.join(', ')}`)
+  if (filters.sdgs.length > 0) {
+    const sdgNames = filters.sdgs.map(id => {
+      const sdg = sdgs.find(s => s.id === id)
+      return sdg ? `${sdg.id}: ${sdg.name}` : `SDG ${id}`
+    })
+    activeFiltersSummary.push(`SDG: ${sdgNames.join(', ')}`)
+  }
+  if (filters.statuses.length > 0) activeFiltersSummary.push(`Phase: ${filters.statuses.join(', ')}`)
+  if (filters.cities.length > 0) activeFiltersSummary.push(`Stadt: ${filters.cities.join(', ')}`)
+  if (filters.states.length > 0) activeFiltersSummary.push(`Bundesland: ${filters.states.join(', ')}`)
+  if (filters.organizations.length > 0) activeFiltersSummary.push(`Organisation: ${filters.organizations.join(', ')}`)
+
   return (
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>Startups ({filteredStartups.length})</CardTitle>
+          <div className="flex-1">
+            <CardTitle>Startups ({filteredStartups.length})</CardTitle>
+            {activeFiltersSummary.length > 0 && (
+              <p className="text-sm text-muted-foreground mt-1">
+                Aktive Filter: {activeFiltersSummary.join(' • ')}
+              </p>
+            )}
+          </div>
           <div className="flex items-center gap-2">
             {selectedRows.length > 0 && (
               <div className="flex items-center gap-2">
@@ -122,30 +193,30 @@ export function StartupsTable({ startups, sdgs, filters, searchQuery }: Startups
         <div className="rounded-md border relative overflow-x-auto">
           <Table>
             <TableHeader>
-              <TableRow className={isStartupColumnFixed ? 'relative' : ''}>
-                <TableHead className={`w-12 ${isStartupColumnFixed ? 'sticky left-0 z-30 bg-white dark:bg-gray-950 border-r after:absolute after:right-0 after:top-0 after:bottom-0 after:w-px after:bg-border' : ''}`}>
+              <TableRow>
+                <TableHead className={`w-12 ${isStartupColumnFixed ? 'sticky left-0 z-30 bg-card border-r shadow-[4px_0_6px_-1px_rgba(0,0,0,0.1)]' : ''}`}>
                   <input
                     type="checkbox"
                     className="rounded"
                     onChange={(e) => {
                       if (e.target.checked) {
-                        setSelectedRows(filteredStartups.map((s) => s.id))
+                        setSelectedRows(filteredStartups.map((s, idx) => `${s.id}-${idx}`))
                       } else {
                         setSelectedRows([])
                       }
                     }}
                   />
                 </TableHead>
-                <TableHead className={`${isStartupColumnFixed ? 'sticky left-0 z-30 relative' : ''}`} style={isStartupColumnFixed ? { 
-                  backgroundColor: 'white',
-                  width: '220px',
-                  minWidth: '220px',
-                  paddingLeft: '60px',
-                  paddingRight: '24px',
-                  boxShadow: '4px 0 6px -1px rgba(0, 0, 0, 0.1)',
-                  borderRight: '1px solid #e5e7eb'
-                } : {}}>Startup</TableHead>
-                <TableHead className={isStartupColumnFixed ? 'pl-6' : ''}>Batch</TableHead>
+                <TableHead 
+                  className={isStartupColumnFixed ? 'sticky z-30 bg-card shadow-[4px_0_6px_-1px_rgba(0,0,0,0.1)] border-r' : ''}
+                  style={isStartupColumnFixed ? { 
+                    left: '48px',
+                    width: '220px',
+                    minWidth: '220px'
+                  } : undefined}
+                >Startup</TableHead>
+                <TableHead>Batch</TableHead>
+                <TableHead>Organisation</TableHead>
                 <TableHead>Sektor</TableHead>
                 <TableHead>SDGs</TableHead>
                 <TableHead>Primary Contact</TableHead>
@@ -158,31 +229,31 @@ export function StartupsTable({ startups, sdgs, filters, searchQuery }: Startups
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredStartups.map((startup) => (
-                <TableRow key={startup.id} className={isStartupColumnFixed ? 'relative' : ''}>
-                  <TableCell className={isStartupColumnFixed ? 'sticky left-0 z-20 bg-white dark:bg-gray-950 border-r after:absolute after:right-0 after:top-0 after:bottom-0 after:w-px after:bg-border' : ''}>
+              {filteredStartups.map((startup, index) => (
+                <TableRow key={`${startup.id}-${index}`}>
+                  <TableCell className={isStartupColumnFixed ? 'sticky left-0 z-20 bg-card border-r shadow-[4px_0_6px_-1px_rgba(0,0,0,0.1)]' : ''}>
                     <input
                       type="checkbox"
                       className="rounded"
-                      checked={selectedRows.includes(startup.id)}
+                      checked={selectedRows.includes(`${startup.id}-${index}`)}
                       onChange={(e) => {
+                        const rowKey = `${startup.id}-${index}`
                         if (e.target.checked) {
-                          setSelectedRows([...selectedRows, startup.id])
+                          setSelectedRows([...selectedRows, rowKey])
                         } else {
-                          setSelectedRows(selectedRows.filter((id) => id !== startup.id))
+                          setSelectedRows(selectedRows.filter((id) => id !== rowKey))
                         }
                       }}
                     />
                   </TableCell>
-                  <TableCell className={`${isStartupColumnFixed ? 'sticky left-0 z-20 relative' : ''}`} style={isStartupColumnFixed ? {
-                    backgroundColor: 'white',
-                    width: '220px',
-                    minWidth: '220px',
-                    paddingLeft: '60px',
-                    paddingRight: '24px',
-                    boxShadow: '4px 0 6px -1px rgba(0, 0, 0, 0.1)',
-                    borderRight: '1px solid #e5e7eb'
-                  } : {}}>
+                  <TableCell 
+                    className={isStartupColumnFixed ? 'sticky z-20 bg-card shadow-[4px_0_6px_-1px_rgba(0,0,0,0.1)] border-r' : ''}
+                    style={isStartupColumnFixed ? {
+                      left: '48px',
+                      width: '220px',
+                      minWidth: '220px'
+                    } : undefined}
+                  >
                     <div className="flex items-center gap-2">
                       <Avatar className="h-8 w-8 flex-shrink-0">
                         <AvatarImage src={startup.logoUrl || "/placeholder.svg"} alt={startup.name} />
@@ -196,8 +267,17 @@ export function StartupsTable({ startups, sdgs, filters, searchQuery }: Startups
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className={isStartupColumnFixed ? 'pl-6' : ''}>
+                  <TableCell>
                     <Badge variant="outline">{startup.batch}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    {startup.organization ? (
+                      <Badge variant={startup.organization === "IFA" ? "default" : "secondary"}>
+                        {startup.organization}
+                      </Badge>
+                    ) : (
+                      <span className="text-sm text-muted-foreground">-</span>
+                    )}
                   </TableCell>
                   <TableCell>
                     <Badge variant="secondary">{startup.sector}</Badge>

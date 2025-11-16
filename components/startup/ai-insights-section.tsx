@@ -270,10 +270,10 @@ export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
       )}
 
       {/* Strengths & Concerns */}
-      {(insight.ai_analysis?.strengths.length || insight.ai_analysis?.concerns.length) && (
+      {(insight.ai_analysis?.strengths?.length || insight.ai_analysis?.concerns?.length) && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Strengths */}
-          {insight.ai_analysis.strengths.length > 0 && (
+          {insight.ai_analysis?.strengths?.length > 0 && (
             <Card className="border-green-200 bg-green-50/30">
               <div className="p-5">
                 <div className="flex items-center gap-2 mb-3">
@@ -281,7 +281,7 @@ export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
                   <h4 className="font-semibold text-green-900">Stärken</h4>
                 </div>
                 <ul className="space-y-2 max-h-40 overflow-y-auto">
-                  {insight.ai_analysis.strengths.map((strength, idx) => (
+                  {insight.ai_analysis?.strengths?.map((strength, idx) => (
                     <li key={idx} className="flex items-start gap-2 text-sm text-green-800">
                       <span className="text-green-600 mt-0.5">•</span>
                       <span>{strength}</span>
@@ -293,7 +293,7 @@ export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
           )}
 
           {/* Concerns */}
-          {insight.ai_analysis.concerns.length > 0 && (
+          {insight.ai_analysis?.concerns?.length > 0 && (
             <Card className="border-orange-200 bg-orange-50/30">
               <div className="p-5">
                 <div className="flex items-center gap-2 mb-3">
@@ -301,7 +301,7 @@ export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
                   <h4 className="font-semibold text-orange-900">Bedenken</h4>
                 </div>
                 <ul className="space-y-2 max-h-40 overflow-y-auto">
-                  {insight.ai_analysis.concerns.map((concern, idx) => (
+                  {insight.ai_analysis?.concerns?.map((concern, idx) => (
                     <li key={idx} className="flex items-start gap-2 text-sm text-orange-800">
                       <span className="text-orange-600 mt-0.5">•</span>
                       <span>{concern}</span>
@@ -467,15 +467,15 @@ export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
       )}
 
       {/* Updates Timeline */}
-      {insight.updates.length > 0 && (
+      {insight.updates?.length > 0 && (
         <Card>
           <div className="p-5">
             <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-purple-600" />
-              Kürzliche Updates ({insight.updates.length})
+              Kürzliche Updates ({insight.updates?.length})
             </h4>
             <div className="space-y-4">
-              {insight.updates.map((update, idx) => (
+              {insight.updates?.map((update, idx) => (
                 <div key={idx} className="border-l-2 border-purple-200 pl-4 pb-4 last:pb-0">
                   <div className="flex items-start justify-between gap-4 mb-2">
                     <div className="flex-1">

@@ -27,6 +27,7 @@ export type Startup = {
   logoUrl?: string
   website?: string
   batch?: string // e.g., "Batch 13"
+  organization?: "IFA" | "IFI" // Organisation category
   city?: string
   state?: string
   country?: string
@@ -94,5 +95,8 @@ export type CrawlRun = {
   sources: ("website" | "linkedin" | "news" | "crunchbase" | "x" | "press")[]
   message?: string
 }
+
+
+
 
 

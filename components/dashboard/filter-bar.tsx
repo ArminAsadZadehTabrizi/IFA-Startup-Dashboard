@@ -16,6 +16,7 @@ interface FilterBarProps {
     statuses: string[]
     cities: string[]
     states: string[]
+    organizations: string[]
     discrepancyRange: [number, number]
     freshnessRange: [number, number]
   }
@@ -55,7 +56,8 @@ export function FilterBar({ filters, onFiltersChange, searchQuery, onSearchChang
     filters.sdgs.length +
     filters.statuses.length +
     filters.cities.length +
-    filters.states.length
+    filters.states.length +
+    filters.organizations.length
 
   const clearAllFilters = () => {
     onFiltersChange({
@@ -65,6 +67,7 @@ export function FilterBar({ filters, onFiltersChange, searchQuery, onSearchChang
       statuses: [],
       cities: [],
       states: [],
+      organizations: [],
       discrepancyRange: [0, 100] as [number, number],
       freshnessRange: [0, 180] as [number, number],
     })
@@ -78,11 +81,20 @@ export function FilterBar({ filters, onFiltersChange, searchQuery, onSearchChang
           <div className="relative flex-1 max-w-md">
             <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground text-lg">🔍</span>
             <Input
-              placeholder="Startups durchsuchen..."
+              placeholder="Nach Name, Sektor, Stadt, Batch, Kontakt suchen..."
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               className="pl-12 h-11 bg-background border-border/50 focus:border-primary/50 transition-colors"
             />
+            {searchQuery && (
+              <button
+                onClick={() => onSearchChange("")}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                title="Suche löschen"
+              >
+                ✕
+              </button>
+            )}
           </div>
 
           {/* Filter Toggle */}
@@ -115,7 +127,7 @@ export function FilterBar({ filters, onFiltersChange, searchQuery, onSearchChang
         {/* Expanded Filters */}
         {showFilters && (
           <div className="mt-6 pt-6 border-t border-border/50 space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-6">
               {/* Batch Filter */}
               <div>
                 <label className="text-sm font-medium mb-2 flex items-center justify-between">
@@ -132,15 +144,20 @@ export function FilterBar({ filters, onFiltersChange, searchQuery, onSearchChang
                   )}
                 </label>
                 <Select
-                  value={filters.batches[0] || undefined}
+                  value={filters.batches[0] || "___all___"}
                   onValueChange={(value) => {
-                    onFiltersChange({ ...filters, batches: [value] })
+                    if (value === "___all___") {
+                      onFiltersChange({ ...filters, batches: [] })
+                    } else {
+                      onFiltersChange({ ...filters, batches: [value] })
+                    }
                   }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Batch auswählen" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="___all___">Alle Batches</SelectItem>
                     {uniqueBatches.map((batch) => (
                       <SelectItem key={batch} value={batch}>
                         {batch}
@@ -166,15 +183,20 @@ export function FilterBar({ filters, onFiltersChange, searchQuery, onSearchChang
                   )}
                 </label>
                 <Select
-                  value={filters.sectors[0] || undefined}
+                  value={filters.sectors[0] || "___all___"}
                   onValueChange={(value) => {
-                    onFiltersChange({ ...filters, sectors: [value] })
+                    if (value === "___all___") {
+                      onFiltersChange({ ...filters, sectors: [] })
+                    } else {
+                      onFiltersChange({ ...filters, sectors: [value] })
+                    }
                   }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Sektor auswählen" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="___all___">Alle Sektoren</SelectItem>
                     {uniqueSectors.map((sector) => (
                       <SelectItem key={sector} value={sector}>
                         {sector}
@@ -200,15 +222,20 @@ export function FilterBar({ filters, onFiltersChange, searchQuery, onSearchChang
                   )}
                 </label>
                 <Select
-                  value={filters.sdgs[0]?.toString() || undefined}
+                  value={filters.sdgs[0]?.toString() || "___all___"}
                   onValueChange={(value) => {
-                    onFiltersChange({ ...filters, sdgs: [parseInt(value)] })
+                    if (value === "___all___") {
+                      onFiltersChange({ ...filters, sdgs: [] })
+                    } else {
+                      onFiltersChange({ ...filters, sdgs: [parseInt(value)] })
+                    }
                   }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="SDG auswählen" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="___all___">Alle SDGs</SelectItem>
                     {availableSdgs.map((sdg) => (
                       <SelectItem key={sdg.id} value={sdg.id.toString()}>
                         {sdg.id}: {sdg.name}
@@ -234,20 +261,25 @@ export function FilterBar({ filters, onFiltersChange, searchQuery, onSearchChang
                   )}
                 </label>
                 <Select
-                  value={filters.statuses[0] || undefined}
+                  value={filters.statuses[0] || "___all___"}
                   onValueChange={(value) => {
-                    onFiltersChange({ ...filters, statuses: [value] })
+                    if (value === "___all___") {
+                      onFiltersChange({ ...filters, statuses: [] })
+                    } else {
+                      onFiltersChange({ ...filters, statuses: [value] })
+                    }
                   }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Programmphase auswählen" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Community">Community</SelectItem>
-                    <SelectItem value="Early">Early</SelectItem>
-                    <SelectItem value="Scale">Scale</SelectItem>
-                    <SelectItem value="IFA Scale">IFA Scale</SelectItem>
-                    <SelectItem value="abgebrochen">abgebrochen</SelectItem>
+                    <SelectItem value="___all___">Alle Phasen</SelectItem>
+                    {uniqueProgramPhases.map((phase) => (
+                      <SelectItem key={phase} value={phase}>
+                        {phase}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -268,15 +300,20 @@ export function FilterBar({ filters, onFiltersChange, searchQuery, onSearchChang
                   )}
                 </label>
                 <Select
-                  value={filters.cities[0] || undefined}
+                  value={filters.cities[0] || "___all___"}
                   onValueChange={(value) => {
-                    onFiltersChange({ ...filters, cities: [value] })
+                    if (value === "___all___") {
+                      onFiltersChange({ ...filters, cities: [] })
+                    } else {
+                      onFiltersChange({ ...filters, cities: [value] })
+                    }
                   }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Stadt auswählen" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="___all___">Alle Städte</SelectItem>
                     {uniqueCities.map((city) => (
                       <SelectItem key={city} value={city}>
                         {city}
@@ -302,20 +339,61 @@ export function FilterBar({ filters, onFiltersChange, searchQuery, onSearchChang
                   )}
                 </label>
                 <Select
-                  value={filters.states[0] || undefined}
+                  value={filters.states[0] || "___all___"}
                   onValueChange={(value) => {
-                    onFiltersChange({ ...filters, states: [value] })
+                    if (value === "___all___") {
+                      onFiltersChange({ ...filters, states: [] })
+                    } else {
+                      onFiltersChange({ ...filters, states: [value] })
+                    }
                   }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Bundesland auswählen" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="___all___">Alle Bundesländer</SelectItem>
                     {uniqueStates.map((state) => (
                       <SelectItem key={state} value={state}>
                         {state}
                       </SelectItem>
                     ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Organization Filter */}
+              <div>
+                <label className="text-sm font-medium mb-2 flex items-center justify-between">
+                  <span>Organisation</span>
+                  {filters.organizations.length > 0 && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => onFiltersChange({ ...filters, organizations: [] })}
+                      className="h-6 px-2 text-xs"
+                    >
+                      ✕
+                    </Button>
+                  )}
+                </label>
+                <Select
+                  value={filters.organizations[0] || "___all___"}
+                  onValueChange={(value) => {
+                    if (value === "___all___") {
+                      onFiltersChange({ ...filters, organizations: [] })
+                    } else {
+                      onFiltersChange({ ...filters, organizations: [value] })
+                    }
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Organisation auswählen" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="___all___">Alle Organisationen</SelectItem>
+                    <SelectItem value="IFA">IFA</SelectItem>
+                    <SelectItem value="IFI">IFI</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

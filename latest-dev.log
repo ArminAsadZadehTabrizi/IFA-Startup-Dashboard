@@ -1,0 +1,31 @@
+
+> impact-startups-dashboard-frontend@1.0.0 dev /Users/Armin/Desktop/Arbeit/Crawler Dashboard Global
+> next dev -p 3001
+
+  ▲ Next.js 14.2.16
+  - Local:        http://localhost:3001
+  - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 1257ms
+ ○ Compiling / ...
+ ✓ Compiled / in 1763ms (814 modules)
+ GET / 200 in 1869ms
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ ✓ Compiled in 250ms (796 modules)
+ GET / 200 in 170ms
+ ✓ Compiled in 123ms (796 modules)
+ ✓ Compiled in 169ms (796 modules)
+ ✓ Compiled in 186ms (796 modules)
+ ✓ Compiled in 132ms (796 modules)
+ ✓ Compiled in 106ms (796 modules)
+ ✓ Compiled in 134ms (796 modules)
+ ✓ Compiled in 232ms (796 modules)
+ GET / 200 in 82ms
+ ✓ Compiled in 341ms (796 modules)
+ ✓ Compiled /api/chat in 200ms (418 modules)
+📊 Loaded 367 startups and 362 AI insights from JSON
+ POST /api/chat 200 in 2415ms
+📊 Loaded 367 startups and 362 AI insights from JSON
+ POST /api/chat 200 in 1737ms
+[?25h

@@ -42,6 +42,7 @@ export default function DashboardPage() {
     statuses: [] as string[],
     cities: [] as string[],
     states: [] as string[],
+    organizations: [] as string[],
     discrepancyRange: [0, 100] as [number, number],
     freshnessRange: [0, 180] as [number, number],
   })
@@ -165,5 +166,8 @@ export default function DashboardPage() {
     </div>
   )
 }
+
+
+
 
 

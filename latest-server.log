@@ -1,0 +1,98 @@
+
+> impact-startups-dashboard-frontend@1.0.0 dev
+> next dev -p 3001
+
+  ▲ Next.js 14.2.16
+  - Local:        http://localhost:3001
+  - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 999ms
+ ○ Compiling / ...
+ ✓ Compiled / in 1778ms (814 modules)
+ ⨯ Error: Cannot find module '/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/.next/server/middleware-manifest.json'
+Require stack:
+- /Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/next-server.js
+- /Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/dev/next-dev-server.js
+- /Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/next.js
+- /Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/lib/start-server.js
+    at Function.<anonymous> (node:internal/modules/cjs/loader:1383:15)
+    at /Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)
+    at Function._load (node:internal/modules/cjs/loader:1192:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1463:12)
+    at mod.require (/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/require-hook.js:65:28)
+    at require (node:internal/modules/helpers:147:16)
+    at DevServer.getMiddlewareManifest (/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/next-server.js:932:26)
+    at DevServer.getEdgeFunctionsPages (/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/next-server.js:948:31)
+    at NextNodeServer.handleCatchallRenderRequest (/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/next-server.js:238:49)
+    at async DevServer.handleRequestImpl (/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/base-server.js:817:17)
+    at async /Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/dev/next-dev-server.js:339:20
+    at async Span.traceAsyncFn (/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/trace/trace.js:154:20)
+    at async DevServer.handleRequest (/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/dev/next-dev-server.js:336:24)
+    at async invokeRender (/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/lib/router-server.js:173:21)
+    at async handleRequest (/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/lib/router-server.js:350:24)
+    at async requestHandlerImpl (/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/lib/router-server.js:374:13)
+    at async Server.requestListener (/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/lib/start-server.js:141:13) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    '/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/next-server.js',
+    '/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/dev/next-dev-server.js',
+    '/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/next.js',
+    '/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/lib/start-server.js'
+  ]
+}
+ ✓ Compiled /_error in 426ms (1022 modules)
+ HEAD / 500 in 2285ms
+ ⨯ Error: Cannot find module '/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/.next/server/middleware-manifest.json'
+Require stack:
+- /Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/next-server.js
+- /Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/dev/next-dev-server.js
+- /Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/next.js
+- /Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/lib/start-server.js
+    at Function.<anonymous> (node:internal/modules/cjs/loader:1383:15)
+    at /Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/require-hook.js:55:36
+    at defaultResolveImpl (node:internal/modules/cjs/loader:1025:19)
+    at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1030:22)
+    at Function._load (node:internal/modules/cjs/loader:1192:37)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)
+    at Module.<anonymous> (node:internal/modules/cjs/loader:1463:12)
+    at mod.require (/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/require-hook.js:65:28)
+    at require (node:internal/modules/helpers:147:16)
+    at DevServer.getMiddlewareManifest (/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/next-server.js:932:26)
+    at DevServer.getEdgeFunctionsPages (/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/next-server.js:948:31)
+    at NextNodeServer.handleCatchallRenderRequest (/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/next-server.js:238:49)
+    at async DevServer.handleRequestImpl (/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/base-server.js:817:17)
+    at async /Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/dev/next-dev-server.js:339:20
+    at async Span.traceAsyncFn (/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/trace/trace.js:154:20)
+    at async DevServer.handleRequest (/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/dev/next-dev-server.js:336:24)
+    at async invokeRender (/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/lib/router-server.js:173:21)
+    at async handleRequest (/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/lib/router-server.js:350:24)
+    at async requestHandlerImpl (/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/lib/router-server.js:374:13)
+    at async Server.requestListener (/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/lib/start-server.js:141:13) {
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [
+    '/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/next-server.js',
+    '/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/dev/next-dev-server.js',
+    '/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/next.js',
+    '/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/lib/start-server.js'
+  ]
+}
+ GET / 500 in 9ms
+ ⨯ TypeError: Cannot convert undefined or null to object
+    at Function.keys (<anonymous>)
+    at DevServer.getEdgeFunctionsPages (/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/next-server.js:952:23)
+    at NextNodeServer.handleCatchallRenderRequest (/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/next-server.js:238:49)
+    at async DevServer.handleRequestImpl (/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/base-server.js:817:17)
+    at async /Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/dev/next-dev-server.js:339:20
+    at async Span.traceAsyncFn (/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/trace/trace.js:154:20)
+    at async DevServer.handleRequest (/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/dev/next-dev-server.js:336:24)
+    at async invokeRender (/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/lib/router-server.js:173:21)
+    at async handleRequest (/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/lib/router-server.js:350:24)
+    at async requestHandlerImpl (/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/lib/router-server.js:374:13)
+    at async Server.requestListener (/Users/Armin/Desktop/Arbeit/Crawler Dashboard Global/node_modules/.pnpm/next@14.2.16_react-dom@18.3.1_react@18.3.1__react@18.3.1/node_modules/next/dist/server/lib/start-server.js:141:13)
+ HEAD / 500 in 10ms
