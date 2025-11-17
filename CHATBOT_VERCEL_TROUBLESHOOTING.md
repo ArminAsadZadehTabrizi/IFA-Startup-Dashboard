@@ -9,7 +9,7 @@ Der AI Chatbot funktioniert lokal einwandfrei, zeigt aber auf Vercel (Production
 
 ## 🔍 Diagnose
 
-### Schritt 1: Überprüfe die Vercel Logs
+### Schritt 1r: Überprüfe die Vercel Logs
 1. Gehe zu [Vercel Dashboard](https://vercel.com/dashboard)
 2. Wähle dein Projekt aus
 3. Klicke auf "Deployments" → Letztes Deployment
