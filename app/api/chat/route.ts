@@ -310,6 +310,12 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error("Chat API error:", error)
+    
+    // Better error logging for debugging
+    const errorDetails = error instanceof Error ? error.message : String(error)
+    console.error("Error details:", errorDetails)
+    
+    // Return more specific error message to help debug
     return NextResponse.json(
       {
         error: "Internal server error",
@@ -317,6 +323,8 @@ export async function POST(request: NextRequest) {
           error instanceof Error
             ? error.message
             : "Ein Fehler ist aufgetreten. Bitte überprüfe deine API-Konfiguration.",
+        // Only include debug info in development
+        ...(process.env.NODE_ENV === 'development' && { debug: errorDetails })
       },
       { status: 500 }
     )

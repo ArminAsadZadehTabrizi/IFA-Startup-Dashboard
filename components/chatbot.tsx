@@ -90,11 +90,12 @@ export function Chatbot() {
         }),
       })
 
-      if (!response.ok) {
-        throw new Error("Failed to get response")
-      }
-
       const data = await response.json()
+
+      if (!response.ok) {
+        // Use the error message from the API if available
+        throw new Error(data.message || data.error || "Failed to get response")
+      }
 
       const assistantMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
@@ -106,11 +107,17 @@ export function Chatbot() {
       setMessages((prev) => [...prev, assistantMessage])
     } catch (error) {
       console.error("Chat error:", error)
+      
+      // Extract error message if available
+      const errorText = error instanceof Error ? error.message : "Unknown error"
+      
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
         content:
-          "Entschuldigung, es gab einen Fehler bei der Verarbeitung deiner Anfrage. Bitte versuche es später erneut.",
+          errorText.includes("API key") || errorText.includes("not configured")
+            ? "⚠️ Der Chatbot ist nicht korrekt konfiguriert. Bitte kontaktiere den Administrator."
+            : `Entschuldigung, es gab einen Fehler: ${errorText}`,
         timestamp: new Date(),
       }
       setMessages((prev) => [...prev, errorMessage])

@@ -81,9 +81,22 @@ vercel --prod
 
 6. Klicke auf "Deploy"
 
-### Environment Variables (Optional)
+### Environment Variables
 
-Dieses Projekt benötigt **keine** Environment Variables für das Deployment.
+**Für den AI Chatbot (erforderlich):**
+
+Der integrierte AI Chatbot benötigt eine Gemini API Key. Füge folgende Environment Variables in Vercel hinzu:
+
+1. Gehe zu deinem Projekt auf Vercel → **Settings** → **Environment Variables**
+2. Füge hinzu:
+   - `GEMINI_API_KEY` - Dein Gemini API Key (kostenlos von https://ai.google.dev/)
+   - `LLM_PROVIDER` - `gemini` (optional, Standard)
+   - `GEMINI_MODEL` - `gemini-2.0-flash-exp` (optional, Standard: `gemini-2.5-flash`)
+
+3. Wähle alle Environments: Production, Preview, Development
+4. Nach dem Hinzufügen: **Redeploy** erforderlich!
+
+**Detaillierte Anleitung:** Siehe [CHATBOT_VERCEL_TROUBLESHOOTING.md](./CHATBOT_VERCEL_TROUBLESHOOTING.md)
 
 ## 📊 Daten aktualisieren
 
@@ -150,10 +163,11 @@ vercel --prod
 ### Verfügbare Scripts
 
 ```bash
-npm run dev      # Development Server (Port 3000)
-npm run build    # Production Build
-npm run start    # Production Server
-npm run lint     # ESLint
+npm run dev        # Development Server (Port 3001)
+npm run build      # Production Build
+npm run start      # Production Server
+npm run lint       # ESLint
+npm run check-env  # Environment Variables überprüfen (Chatbot)
 ```
 
 ### Neue Features hinzufügen
@@ -173,6 +187,22 @@ Du **kannst nicht**:
 Für Backend-Funktionen siehe das Original-Projekt im lokalen Ordner.
 
 ## 🐛 Troubleshooting
+
+### AI Chatbot funktioniert nicht auf Vercel
+
+**Symptom:** Fehlermeldung "Entschuldigung, es gab einen Fehler..."
+
+**Lösung:** Siehe ausführliche Anleitung: [CHATBOT_VERCEL_TROUBLESHOOTING.md](./CHATBOT_VERCEL_TROUBLESHOOTING.md)
+
+**Kurzanleitung:**
+1. Gemini API Key besorgen: https://ai.google.dev/
+2. In Vercel: Settings → Environment Variables → `GEMINI_API_KEY` hinzufügen
+3. Redeploy
+
+**Lokale Überprüfung:**
+```bash
+npm run check-env
+```
 
 ### "Failed to load data"
 
