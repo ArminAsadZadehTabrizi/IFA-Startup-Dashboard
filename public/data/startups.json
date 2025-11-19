@@ -1903,6 +1903,7 @@
     "sector": "Lebenswerte Städte & Mobilität",
     "status": "active",
     "programPhase": "Scale",
+    "teamSize": 3,
     "primaryContact": {
       "id": "003Sc00000MYTcSIAX",
       "name": "Carl Müller",
@@ -12513,12 +12514,14 @@
     "website": "https://www.goava.ai/",
     "batch": "Batch 1",
     "organization": "IFA",
-    "city": null,
+    "city": "Essen",
     "state": null,
     "country": null,
     "sdgs": [],
     "sector": "Sonstiges",
     "status": "dormant",
+    "programPhase": "IFA Scale",
+    "teamSize": 30,
     "primaryContact": {
       "id": "003Sc00000mMCQUIA4",
       "name": "Jan Schellenberger",
@@ -12550,12 +12553,20 @@
     "website": "https://investit-academy.de/",
     "batch": "Batch 1",
     "organization": "IFA",
-    "city": null,
+    "city": "Hamburg",
     "state": null,
     "country": null,
     "sdgs": [],
     "sector": "Bildung & Inklusion",
     "status": "dormant",
+    "teamSize": 4,
+    "primaryContact": {
+      "id": "003Sc00000INVESTIT",
+      "name": "Jana Tichauer",
+      "email": "jana.tichauer@investit-academy.de",
+      "phone": "+4915773315599",
+      "title": null
+    },
     "description": null,
     "official": {
       "description": null,
@@ -12589,6 +12600,7 @@
     "sector": "Gesundheit & Pflege",
     "status": "active",
     "programPhase": "IFA Scale",
+    "teamSize": 8,
     "primaryContact": {
       "id": "003Sc00000mKMAxIAO",
       "name": "Marcel Kintscher",
@@ -12671,6 +12683,7 @@
     "sector": "Demokratie & resiliente Gesellschaft",
     "status": "dormant",
     "programPhase": "Community",
+    "teamSize": 3,
     "primaryContact": {
       "id": "003Sc000004TbwLIAS",
       "name": "Karsten Hirsch",
@@ -12711,6 +12724,7 @@
     "sector": "Klimaschutz & erneuerbare Energien",
     "status": "dormant",
     "programPhase": "Community",
+    "teamSize": 23,
     "primaryContact": {
       "id": "003Sc000004TbvTIAS",
       "name": "Andreas Kunsmann",
@@ -12742,12 +12756,13 @@
     "website": "https://radelnohnealter.de/",
     "batch": "Batch 1",
     "organization": "IFA",
-    "city": null,
+    "city": "Bonn",
     "state": null,
     "country": null,
     "sdgs": [],
     "sector": "Demokratie & resiliente Gesellschaft",
     "status": "dormant",
+    "teamSize": 7,
     "primaryContact": {
       "id": "003Sc00000mMsJ4IAK",
       "name": "Natalie Chirchietti",
@@ -12788,6 +12803,7 @@
     "sector": "Sonstiges",
     "status": "active",
     "programPhase": "Scale",
+    "teamSize": 3,
     "primaryContact": {
       "id": "003Sc00000MYbq5IAD",
       "name": "André Lau",
@@ -12819,12 +12835,13 @@
     "website": "https://www.urbancoopberlin.de/",
     "batch": "Batch 1",
     "organization": "IFA",
-    "city": null,
+    "city": "Berlin",
     "state": null,
     "country": null,
     "sdgs": [],
     "sector": "Lebenswerte Städte & Mobilität",
     "status": "dormant",
+    "teamSize": 5,
     "primaryContact": {
       "id": "003Sc00000mM3zjIAC",
       "name": "Robert Ostmann",
@@ -12846,6 +12863,45 @@
       "completenessPct": 70,
       "discrepancyScore": 0,
       "lastCheckedAt": "2025-11-12T14:23:01.000Z"
+    },
+    "sources": [],
+    "notes": []
+  },
+  {
+    "id": "001Sc00000MOMONEW",
+    "name": "momo hört zu",
+    "website": "https://www.momohoertzu.de/",
+    "batch": "Batch 1",
+    "organization": "IFA",
+    "city": "München",
+    "state": "Bayern",
+    "country": null,
+    "sdgs": [],
+    "sector": null,
+    "status": "active",
+    "programPhase": "IFA Scale",
+    "teamSize": 6,
+    "primaryContact": {
+      "id": "003Sc00000MOMOISABEL",
+      "name": "Isabel Bertram",
+      "email": "isabel@momohoertzu.de",
+      "phone": "+491627491810",
+      "title": null
+    },
+    "description": null,
+    "official": {
+      "description": null,
+      "updatedAt": "2025-11-19T00:00:00.000Z"
+    },
+    "latest": {
+      "description": null,
+      "updatedAt": "2025-11-19T00:00:00.000Z"
+    },
+    "quality": {
+      "freshnessDays": 0,
+      "completenessPct": 76,
+      "discrepancyScore": 0,
+      "lastCheckedAt": "2025-11-19T00:00:00.000Z"
     },
     "sources": [],
     "notes": []

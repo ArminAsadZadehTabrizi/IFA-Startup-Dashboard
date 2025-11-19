@@ -74,7 +74,7 @@ export function FilterBar({ filters, onFiltersChange, searchQuery, onSearchChang
   }
 
   return (
-    <Card className="sticky top-6 z-10 card-enhanced backdrop-blur-md bg-card/95">
+    <Card className="card-enhanced">
       <CardContent className="p-6">
         <div className="flex items-center gap-6">
           {/* Search */}
@@ -362,10 +362,10 @@ export function FilterBar({ filters, onFiltersChange, searchQuery, onSearchChang
                 </Select>
               </div>
 
-              {/* Organization Filter */}
+              {/* Program Filter */}
               <div>
                 <label className="text-sm font-medium mb-2 flex items-center justify-between">
-                  <span>Organisation</span>
+                  <span>Programm</span>
                   {filters.organizations.length > 0 && (
                     <Button
                       variant="ghost"
@@ -388,10 +388,10 @@ export function FilterBar({ filters, onFiltersChange, searchQuery, onSearchChang
                   }}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Organisation auswählen" />
+                    <SelectValue placeholder="Programm auswählen" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="___all___">Alle Organisationen</SelectItem>
+                    <SelectItem value="___all___">Alle Programme</SelectItem>
                     <SelectItem value="IFA">IFA</SelectItem>
                     <SelectItem value="IFI">IFI</SelectItem>
                   </SelectContent>

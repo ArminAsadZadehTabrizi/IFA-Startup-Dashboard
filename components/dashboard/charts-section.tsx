@@ -39,13 +39,13 @@ export function ChartsSection({ startups, sdgs }: ChartsSectionProps) {
     .map((sdg) => {
       const count = startups.filter((startup) => startup.sdgs.includes(sdg.id)).length
       return {
-        name: sdg.name.split(" ").slice(-2).join(" "),
-        fullName: sdg.name,
+        id: sdg.id,
+        name: sdg.name,
         count,
       }
     })
     .filter((item) => item.count > 0)
-    .sort((a, b) => b.count - a.count)
+    .sort((a, b) => a.id - b.id) // Sort by SDG number
 
   // Prepare program phase data
   const programPhaseColors = [
@@ -78,7 +78,25 @@ export function ChartsSection({ startups, sdgs }: ChartsSectionProps) {
     }))
     .sort((a, b) => b.value - a.value) // Sort by count descending
 
+  // Prepare sector data
+  const sectorData = Object.entries(
+    startups.reduce(
+      (acc, startup) => {
+        acc[startup.sector] = (acc[startup.sector] || 0) + 1
+        return acc
+      },
+      {} as Record<string, number>,
+    ),
+  )
+    .map(([sector, count]) => ({
+      name: sector,
+      count,
+      color: SECTOR_COLORS[sector] || "#6b7280",
+    }))
+    .sort((a, b) => b.count - a.count) // Sort by count descending
+
   const maxSDGCount = Math.max(...sdgData.map((item) => item.count))
+  const maxSectorCount = Math.max(...sectorData.map((item) => item.count))
   const maxFreshness = Math.max(...scatterData.map((item) => item.x))
   const maxDiscrepancy = Math.max(...scatterData.map((item) => item.y))
 
@@ -209,17 +227,50 @@ export function ChartsSection({ startups, sdgs }: ChartsSectionProps) {
         <CardContent>
           <div className="space-y-3">
             {sdgData.map((sdg, index) => (
-              <div key={sdg.name} className="flex items-center gap-4">
-                <div className="w-32 text-sm font-medium truncate" title={sdg.fullName}>
-                  {sdg.name}
+              <div key={sdg.id} className="flex items-center gap-4">
+                <div className="w-16 text-sm font-bold" title={sdg.name}>
+                  SDG {sdg.id}
                 </div>
                 <div className="flex-1 relative">
                   <div className="h-8 bg-gray-100 rounded-md overflow-hidden">
                     <div
                       className="h-full bg-[#D4AE36] transition-all duration-500 flex items-center justify-end pr-2"
                       style={{ width: `${(sdg.count / maxSDGCount) * 100}%` }}
+                      title={sdg.name}
                     >
                       <span className="text-xs font-bold text-white">{sdg.count}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Sector Bar Chart */}
+      <Card className="lg:col-span-3">
+        <CardHeader>
+          <CardTitle>Startups by Sector</CardTitle>
+          <p className="text-sm text-muted-foreground">Distribution across sectors</p>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {sectorData.map((sector, index) => (
+              <div key={sector.name} className="flex items-center gap-4">
+                <div className="w-64 text-sm font-medium truncate" title={sector.name}>
+                  {sector.name}
+                </div>
+                <div className="flex-1 relative">
+                  <div className="h-8 bg-gray-100 rounded-md overflow-hidden">
+                    <div
+                      className="h-full transition-all duration-500 flex items-center justify-end pr-2"
+                      style={{ 
+                        width: `${(sector.count / maxSectorCount) * 100}%`,
+                        backgroundColor: sector.color
+                      }}
+                    >
+                      <span className="text-xs font-bold text-white">{sector.count}</span>
                     </div>
                   </div>
                 </div>

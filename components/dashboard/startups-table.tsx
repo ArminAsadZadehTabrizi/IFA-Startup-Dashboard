@@ -150,7 +150,7 @@ export function StartupsTable({ startups, sdgs, filters, searchQuery }: Startups
   if (filters.statuses.length > 0) activeFiltersSummary.push(`Phase: ${filters.statuses.join(', ')}`)
   if (filters.cities.length > 0) activeFiltersSummary.push(`Stadt: ${filters.cities.join(', ')}`)
   if (filters.states.length > 0) activeFiltersSummary.push(`Bundesland: ${filters.states.join(', ')}`)
-  if (filters.organizations.length > 0) activeFiltersSummary.push(`Organisation: ${filters.organizations.join(', ')}`)
+  if (filters.organizations.length > 0) activeFiltersSummary.push(`Programm: ${filters.organizations.join(', ')}`)
 
   return (
     <Card>
@@ -216,15 +216,12 @@ export function StartupsTable({ startups, sdgs, filters, searchQuery }: Startups
                   } : undefined}
                 >Startup</TableHead>
                 <TableHead>Batch</TableHead>
-                <TableHead>Organisation</TableHead>
+                <TableHead>Programm</TableHead>
                 <TableHead>Sektor</TableHead>
                 <TableHead>SDGs</TableHead>
                 <TableHead>Primary Contact</TableHead>
                 <TableHead>Standort</TableHead>
                 <TableHead>Programmphase</TableHead>
-                <TableHead>Aktualität</TableHead>
-                <TableHead>Abweichung</TableHead>
-                <TableHead>Zuletzt geprüft</TableHead>
                 <TableHead>Aktionen</TableHead>
               </TableRow>
             </TableHeader>
@@ -254,18 +251,22 @@ export function StartupsTable({ startups, sdgs, filters, searchQuery }: Startups
                       minWidth: '220px'
                     } : undefined}
                   >
-                    <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleViewStartup(startup)}
+                      className="flex items-center gap-2 text-left hover:opacity-80 transition-opacity w-full"
+                      title="Startup-Details anzeigen"
+                    >
                       <Avatar className="h-8 w-8 flex-shrink-0">
                         <AvatarImage src={startup.logoUrl || "/placeholder.svg"} alt={startup.name} />
                         <AvatarFallback>{startup.name.substring(0, 2).toUpperCase()}</AvatarFallback>
                       </Avatar>
                       <div className="min-w-0 flex-1">
-                        <div className="font-medium whitespace-nowrap">{startup.name}</div>
+                        <div className="font-medium whitespace-nowrap text-blue-600 hover:underline">{startup.name}</div>
                         {startup.website && (
                           <div className="text-xs text-muted-foreground truncate">{startup.website.replace("https://", "").split('/')[0]}</div>
                         )}
                       </div>
-                    </div>
+                    </button>
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline">{startup.batch}</Badge>
@@ -284,17 +285,20 @@ export function StartupsTable({ startups, sdgs, filters, searchQuery }: Startups
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-1">
-                      {startup.sdgs.slice(0, 2).map((sdgId) => {
+                      {startup.sdgs.slice(0, 3).map((sdgId) => {
                         const sdg = sdgs.find(s => s.id === sdgId)
                         return (
                           <Badge key={sdgId} variant="outline" className="text-xs" title={sdg?.name}>
-                            {sdg?.name || `SDG ${sdgId}`}
+                            {sdgId}
                           </Badge>
                         )
                       })}
-                      {startup.sdgs.length > 2 && (
-                        <Badge variant="outline" className="text-xs">
-                          +{startup.sdgs.length - 2}
+                      {startup.sdgs.length > 3 && (
+                        <Badge variant="outline" className="text-xs" title={startup.sdgs.slice(3).map(id => {
+                          const sdg = sdgs.find(s => s.id === id)
+                          return sdg?.name || `SDG ${id}`
+                        }).join(', ')}>
+                          +{startup.sdgs.length - 3}
                         </Badge>
                       )}
                     </div>
@@ -333,30 +337,7 @@ export function StartupsTable({ startups, sdgs, filters, searchQuery }: Startups
                     )}
                   </TableCell>
                   <TableCell>
-                    <div className={`text-sm font-medium ${getQualityColor(100 - startup.quality.freshnessDays)}`}>
-                      {startup.quality.freshnessDays}d
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className={`text-sm font-medium ${getQualityColor(100 - startup.quality.discrepancyScore)}`}>
-                      {startup.quality.discrepancyScore}%
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-sm text-muted-foreground">
-                      {formatRelativeTime(startup.quality.lastCheckedAt)}
-                    </div>
-                  </TableCell>
-                  <TableCell>
                     <div className="flex items-center gap-1">
-                      <Button 
-                        size="sm" 
-                        variant="ghost"
-                        onClick={() => handleViewStartup(startup)}
-                        title="Startup-Details anzeigen"
-                      >
-                        <span>👁</span>
-                      </Button>
                       {startup.website && (
                         <Button size="sm" variant="ghost" asChild>
                           <a href={startup.website} target="_blank" rel="noopener noreferrer" title="Website öffnen">
