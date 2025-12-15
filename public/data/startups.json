@@ -12548,44 +12548,6 @@
     "notes": []
   },
   {
-    "id": "001Sc00000dQe3bIAC",
-    "name": "Invest it e.V.",
-    "website": "https://investit-academy.de/",
-    "batch": "Batch 1",
-    "organization": "IFA",
-    "city": "Hamburg",
-    "state": null,
-    "country": null,
-    "sdgs": [],
-    "sector": "Bildung & Inklusion",
-    "status": "dormant",
-    "teamSize": 4,
-    "primaryContact": {
-      "id": "003Sc00000INVESTIT",
-      "name": "Jana Tichauer",
-      "email": "jana.tichauer@investit-academy.de",
-      "phone": "+4915773315599",
-      "title": null
-    },
-    "description": null,
-    "official": {
-      "description": null,
-      "updatedAt": "2025-11-12T14:27:25.000Z"
-    },
-    "latest": {
-      "description": null,
-      "updatedAt": "2025-11-12T14:27:25.000Z"
-    },
-    "quality": {
-      "freshnessDays": 4,
-      "completenessPct": 70,
-      "discrepancyScore": 0,
-      "lastCheckedAt": "2025-11-12T14:27:25.000Z"
-    },
-    "sources": [],
-    "notes": []
-  },
-  {
     "id": "001Sc00000dPTN1IAO",
     "name": "Luma Life",
     "website": "https://lumalife.de/",
@@ -12710,47 +12672,6 @@
     "notes": []
   },
   {
-    "id": "001Sc0000041qb9IAA",
-    "name": "Polycare",
-    "website": "https://polycare.de/",
-    "batch": "Batch 4",
-    "organization": "IFA",
-    "city": "Suhl",
-    "state": "Thüringen",
-    "country": null,
-    "sdgs": [
-      9
-    ],
-    "sector": "Klimaschutz & erneuerbare Energien",
-    "status": "dormant",
-    "programPhase": "Community",
-    "teamSize": 23,
-    "primaryContact": {
-      "id": "003Sc000004TbvTIAS",
-      "name": "Andreas Kunsmann",
-      "email": "a.kunsmann@polycare.de",
-      "phone": "+4917683124817",
-      "title": null
-    },
-    "description": null,
-    "official": {
-      "description": null,
-      "updatedAt": "2025-11-12T15:12:17.000Z"
-    },
-    "latest": {
-      "description": null,
-      "updatedAt": "2025-11-12T15:12:17.000Z"
-    },
-    "quality": {
-      "freshnessDays": 4,
-      "completenessPct": 76,
-      "discrepancyScore": 0,
-      "lastCheckedAt": "2025-11-12T15:12:17.000Z"
-    },
-    "sources": [],
-    "notes": []
-  },
-  {
     "id": "001Sc00000dRIs5IAG",
     "name": "Radeln ohne Alter Deutschland e.V.",
     "website": "https://radelnohnealter.de/",
@@ -12830,44 +12751,6 @@
     "notes": []
   },
   {
-    "id": "001Sc00000dRLOVIA4",
-    "name": "urban coop berlin eG",
-    "website": "https://www.urbancoopberlin.de/",
-    "batch": "Batch 1",
-    "organization": "IFA",
-    "city": "Berlin",
-    "state": null,
-    "country": null,
-    "sdgs": [],
-    "sector": "Lebenswerte Städte & Mobilität",
-    "status": "dormant",
-    "teamSize": 5,
-    "primaryContact": {
-      "id": "003Sc00000mM3zjIAC",
-      "name": "Robert Ostmann",
-      "email": "info@urbancoopberlin.de",
-      "phone": null,
-      "title": null
-    },
-    "description": null,
-    "official": {
-      "description": null,
-      "updatedAt": "2025-11-12T14:23:01.000Z"
-    },
-    "latest": {
-      "description": null,
-      "updatedAt": "2025-11-12T14:23:01.000Z"
-    },
-    "quality": {
-      "freshnessDays": 4,
-      "completenessPct": 70,
-      "discrepancyScore": 0,
-      "lastCheckedAt": "2025-11-12T14:23:01.000Z"
-    },
-    "sources": [],
-    "notes": []
-  },
-  {
     "id": "001Sc00000MOMONEW",
     "name": "momo hört zu",
     "website": "https://www.momohoertzu.de/",
@@ -12902,6 +12785,90 @@
       "completenessPct": 76,
       "discrepancyScore": 0,
       "lastCheckedAt": "2025-11-19T00:00:00.000Z"
+    },
+    "sources": [],
+    "notes": []
+  },
+  {
+    "id": "001Sc00000GOOD24NEW",
+    "name": "Good24 gGmbH",
+    "website": "https://www.good24.de/",
+    "batch": "Batch 1",
+    "organization": "IFA",
+    "city": "Großröhrsdorf",
+    "state": "Sachsen",
+    "country": null,
+    "sdgs": [
+      17
+    ],
+    "sector": "Kreislaufwirtschaft",
+    "status": "active",
+    "programPhase": "IFA Scale",
+    "teamSize": null,
+    "primaryContact": {
+      "id": "003Sc00000GOOD24DIRK",
+      "name": "Dirk Lenz",
+      "email": "dirk@good24.de",
+      "phone": "+491622020505",
+      "title": null
+    },
+    "description": null,
+    "official": {
+      "description": null,
+      "updatedAt": "2025-12-15T00:00:00.000Z"
+    },
+    "latest": {
+      "description": null,
+      "updatedAt": "2025-12-15T00:00:00.000Z"
+    },
+    "quality": {
+      "freshnessDays": 0,
+      "completenessPct": 76,
+      "discrepancyScore": 0,
+      "lastCheckedAt": "2025-12-15T00:00:00.000Z"
+    },
+    "sources": [],
+    "notes": []
+  },
+  {
+    "id": "001Sc00000SOLARHUB",
+    "name": "SolarHub",
+    "website": "https://www.solarhub24.de/",
+    "batch": "Batch 1",
+    "organization": "IFA",
+    "city": "Freiburg im Breisgau",
+    "state": "Baden-Württemberg",
+    "country": null,
+    "sdgs": [
+      7,
+      11,
+      13
+    ],
+    "sector": null,
+    "status": "active",
+    "programPhase": "IFA Scale",
+    "teamSize": null,
+    "primaryContact": {
+      "id": "003Sc00000SOLARDAVID",
+      "name": "David Wolf",
+      "email": "david@solarhub24.de",
+      "phone": "+491743491624",
+      "title": null
+    },
+    "description": null,
+    "official": {
+      "description": null,
+      "updatedAt": "2025-12-15T00:00:00.000Z"
+    },
+    "latest": {
+      "description": null,
+      "updatedAt": "2025-12-15T00:00:00.000Z"
+    },
+    "quality": {
+      "freshnessDays": 0,
+      "completenessPct": 76,
+      "discrepancyScore": 0,
+      "lastCheckedAt": "2025-12-15T00:00:00.000Z"
     },
     "sources": [],
     "notes": []
