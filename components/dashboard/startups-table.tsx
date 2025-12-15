@@ -44,10 +44,10 @@ export function StartupsTable({ startups, sdgs, filters, searchQuery }: Startups
       const query = searchQuery.toLowerCase().trim()
       result = result.filter(startup => {
         // Search in startup name
-        if (startup.name.toLowerCase().includes(query)) return true
+        if (startup.name?.toLowerCase().includes(query)) return true
         
         // Search in sector
-        if (startup.sector.toLowerCase().includes(query)) return true
+        if (startup.sector?.toLowerCase().includes(query)) return true
         
         // Search in city
         if (startup.city?.toLowerCase().includes(query)) return true
@@ -59,7 +59,7 @@ export function StartupsTable({ startups, sdgs, filters, searchQuery }: Startups
         if (startup.batch?.toLowerCase().includes(query)) return true
         
         // Search in primary contact name
-        if (startup.primaryContact?.name.toLowerCase().includes(query)) return true
+        if (startup.primaryContact?.name?.toLowerCase().includes(query)) return true
         
         // Search in website
         if (startup.website?.toLowerCase().includes(query)) return true
@@ -326,7 +326,7 @@ export function StartupsTable({ startups, sdgs, filters, searchQuery }: Startups
                   </TableCell>
                   <TableCell>
                     <div className="text-sm">
-                      {startup.city}, {startup.state}
+                      {startup.city && startup.state ? `${startup.city}, ${startup.state}` : (startup.city || startup.state || '-')}
                     </div>
                   </TableCell>
                   <TableCell>

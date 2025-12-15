@@ -32,12 +32,12 @@ export function FilterBar({ filters, onFiltersChange, searchQuery, onSearchChang
 
   // Sort batches numerically (Batch 1, Batch 2, ..., Batch 13)
   const uniqueBatches = [...new Set(startups.map((s) => s.batch).filter(Boolean))].sort((a, b) => {
-    const numA = parseInt(a.replace(/\D/g, '')) || 0
-    const numB = parseInt(b.replace(/\D/g, '')) || 0
+    const numA = parseInt(a?.replace(/\D/g, '') || '0') || 0
+    const numB = parseInt(b?.replace(/\D/g, '') || '0') || 0
     return numA - numB
   })
   
-  const uniqueSectors = [...new Set(startups.map((s) => s.sector))]
+  const uniqueSectors = [...new Set(startups.map((s) => s.sector).filter(Boolean))]
   
   // Use programPhase instead of status
   const uniqueProgramPhases = [...new Set(startups.map((s) => s.programPhase).filter(Boolean))]
