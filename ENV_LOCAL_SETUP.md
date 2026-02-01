@@ -39,3 +39,4 @@ Kopieren Sie den generierten Hash und ersetzen Sie `ADMIN_PASSWORD_HASH` in `.en
 
 Mehr Details finden Sie in **LOGIN_SETUP.md**
 
+

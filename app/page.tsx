@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Link from "next/link"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useStartups, useCrawlRuns, useSDGs } from "@/hooks/use-dashboard-data"
@@ -11,7 +12,7 @@ import { StartupsTable } from "@/components/dashboard/startups-table"
 import { CrawlerSimulation } from "@/components/crawler-simulation"
 import { FeedbackButton } from "@/components/feedback-modal"
 import { signOut, useSession } from "next-auth/react"
-import { LogOut } from "lucide-react"
+import { LogOut, Newspaper } from "lucide-react"
 import Image from "next/image"
 
 export default function DashboardPage() {
@@ -138,6 +139,17 @@ export default function DashboardPage() {
               variant="outline"
               size="default"
               className="btn-modern bg-transparent border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white w-full sm:w-auto"
+              asChild
+            >
+              <Link href="/news">
+                <Newspaper className="w-4 h-4 mr-2" />
+                News Feed
+              </Link>
+            </Button>
+            <Button
+              variant="outline"
+              size="default"
+              className="btn-modern bg-transparent border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white w-full sm:w-auto"
             >
               ↓ Exportieren
             </Button>
@@ -204,9 +216,3 @@ export default function DashboardPage() {
     </div>
   )
 }
-
-
-
-
-
-

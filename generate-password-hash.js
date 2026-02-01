@@ -19,3 +19,4 @@ console.log(hash);
 console.log('\n📝 Fügen Sie diesen Hash in Ihre .env.local Datei ein:');
 console.log(`ADMIN_PASSWORD_HASH="${hash}"\n`);
 
+

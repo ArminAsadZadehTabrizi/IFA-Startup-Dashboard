@@ -118,3 +118,4 @@ fs.writeFileSync(startupsPath, JSON.stringify(startups, null, 2), 'utf8');
 
 console.log(`\n💾 Startups wurden in ${startupsPath} gespeichert!\n`);
 
+
