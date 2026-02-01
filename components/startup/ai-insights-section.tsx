@@ -1,13 +1,13 @@
 'use client'
 
+import { useState } from 'react'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { useAIInsight } from '@/hooks/use-dashboard-data'
-import { 
-  Sparkles, 
-  TrendingUp, 
-  AlertCircle, 
-  CheckCircle2, 
+import {
+  Sparkles,
+  TrendingUp,
+  AlertCircle,
+  CheckCircle2,
   ExternalLink,
   Calendar,
   Target,
@@ -22,29 +22,35 @@ import {
   Linkedin
 } from 'lucide-react'
 
-interface AIUpdate {
+// Interfaces defined inline to ensure compatibility
+export interface AIUpdate {
   date: string
   title: string
   description: string
   source: string
-  category: 'funding' | 'product' | 'team' | 'partnership' | 'news'
+  category: 'funding' | 'product' | 'team' | 'partnership' | 'news' | 'impact' | 'other'
   impact_score: number
   verified?: boolean
 }
 
-interface AIInsight {
+export interface AIInsight {
   startup_id: string
   startup_name: string
   analyzed_at: string
   status: 'active' | 'dormant' | 'acquired' | 'pivoted' | 'unknown'
+  german_summary?: string // New: Professional German summary for alumni analysis
   updates: AIUpdate[]
   business_metrics?: {
-    estimated_revenue_trend: string
-    team_size_trend: string
     team_size?: number
-    team_size_source?: 'website' | 'linkedin' | 'unknown'
-    market_presence: string
-    funding_status: string
+    team_size_source?: string
+    funding_status?: 'seed_funded' | 'series_a' | 'series_b' | 'angel_funded' | 'acquired' | 'bootstrapped' | 'funded' | 'unknown'
+    last_activity_date?: string
+    awards?: string[]
+    key_partnerships?: string[]
+    // Legacy fields for backwards compatibility
+    estimated_revenue_trend?: 'growing' | 'stable' | 'declining' | 'unknown'
+    team_size_trend?: 'growing' | 'stable' | 'declining' | 'unknown'
+    market_presence?: 'strong' | 'moderate' | 'weak' | 'unknown'
     last_active_date?: string
   }
   founders?: {
@@ -79,7 +85,66 @@ interface AIInsightsSectionProps {
 }
 
 export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
-  const { data: insight, isLoading: loading, error } = useAIInsight(startupId)
+  const [insight, setInsight] = useState<any | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useState(() => {
+    async function fetchInsights() {
+      try {
+        // Try to fetch from the static JSON file first (common in global dashboard)
+        // or the API if it exists
+        try {
+          const response = await fetch('/data/ai-insights.json')
+          if (response.ok) {
+            const data = await response.json()
+            const insights = data.insights || []
+            const match = insights.find((i: any) => i.startup_id === startupId)
+            setInsight(match || null)
+            setLoading(false)
+            return
+          }
+        } catch (e) {
+          // ignore
+        }
+
+        // Fallback to API route
+        const response = await fetch('/api/ai-insights')
+        if (!response.ok) throw new Error('Failed to fetch insights')
+
+        const data = await response.json()
+        const insights = data.insights || []
+        const match = insights.find((i: any) => i.startup_id === startupId)
+
+        setInsight(match || null)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Unknown error')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchInsights()
+  })
+
+  // Helper functions to handle both data structures
+  // PRIORITIZE GERMAN SUMMARY
+  const getAISummary = () => insight?.german_summary || insight?.ai_analysis?.summary || insight?.ai_summary || ''
+
+  const getStrengths = () => insight?.ai_analysis?.strengths || insight?.strengths || []
+  const getConcerns = () => insight?.ai_analysis?.concerns || insight?.concerns || []
+  const getRecommendation = () => insight?.ai_analysis?.recommendation || insight?.recommendation || 'insufficient_data'
+  const getConfidenceScore = () => insight?.ai_analysis?.confidence_score || insight?.confidence_score || 0
+  const getDataQuality = () => insight?.ai_analysis?.data_quality || insight?.data_quality || 'N/A'
+  const getUpdates = () => {
+    const updates = insight?.updates || insight?.recent_updates || []
+    return updates.map((u: any) => ({
+      ...u,
+      title: u.title || u.category || 'Update',
+      source: u.source || u.source_url || '',
+      description: u.description || ''
+    }))
+  }
 
   if (loading) {
     return (
@@ -154,10 +219,10 @@ export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
 
   const formatDate = (dateStr: string) => {
     try {
-      return new Date(dateStr).toLocaleDateString('de-DE', { 
-        day: '2-digit', 
-        month: 'short', 
-        year: 'numeric' 
+      return new Date(dateStr).toLocaleDateString('de-DE', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric'
       })
     } catch {
       return dateStr
@@ -195,13 +260,13 @@ export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
                 </div>
               </div>
             </div>
-            
+
             {/* Data Quality Indicator */}
             <div className="text-right">
               <div className="flex items-center gap-2 justify-end mb-1">
                 <Shield className="w-4 h-4 text-gray-600" />
                 <span className="text-xs font-medium text-gray-700">
-                  {insight.ai_analysis?.data_quality || 'N/A'}
+                  {getDataQuality()}
                 </span>
               </div>
               <div className={`text-xs flex items-center gap-1 justify-end ${getFreshnessColor(insight.data_freshness)}`}>
@@ -211,24 +276,24 @@ export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
             </div>
           </div>
 
-          {/* AI Summary */}
-          {insight.ai_analysis?.summary && (
+          {/* AI Summary (GERMAN) */}
+          {getAISummary() && (
             <div className="bg-white/50 rounded-lg p-4 mb-4 max-h-32 overflow-y-auto">
               <p className="text-sm text-gray-700 leading-relaxed">
-                {insight.ai_analysis.summary}
+                {getAISummary()}
               </p>
             </div>
           )}
 
           {/* Recommendation & Confidence */}
           <div className="flex items-center gap-3">
-            <Badge className={`${getRecommendationColor(insight.ai_analysis?.recommendation || '')} border text-sm px-3 py-1`}>
-              {getRecommendationText(insight.ai_analysis?.recommendation || '')}
+            <Badge className={`${getRecommendationColor(getRecommendation())} border text-sm px-3 py-1`}>
+              {getRecommendationText(getRecommendation())}
             </Badge>
-            {insight.ai_analysis?.confidence_score && (
+            {getConfidenceScore() > 0 && (
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <BarChart3 className="w-4 h-4" />
-                <span>Vertrauenswert: {insight.ai_analysis.confidence_score > 100 ? Math.round(insight.ai_analysis.confidence_score / 100) : Math.round(insight.ai_analysis.confidence_score)}%</span>
+                <span>Vertrauenswert: {getConfidenceScore() > 100 ? Math.round(getConfidenceScore() / 100) : Math.round(getConfidenceScore())}%</span>
               </div>
             )}
           </div>
@@ -270,10 +335,10 @@ export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
       )}
 
       {/* Strengths & Concerns */}
-      {(insight.ai_analysis?.strengths?.length || insight.ai_analysis?.concerns?.length) && (
+      {(getStrengths().length > 0 || getConcerns().length > 0) && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Strengths */}
-          {insight.ai_analysis?.strengths?.length > 0 && (
+          {getStrengths().length > 0 && (
             <Card className="border-green-200 bg-green-50/30">
               <div className="p-5">
                 <div className="flex items-center gap-2 mb-3">
@@ -281,7 +346,7 @@ export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
                   <h4 className="font-semibold text-green-900">Stärken</h4>
                 </div>
                 <ul className="space-y-2 max-h-40 overflow-y-auto">
-                  {insight.ai_analysis?.strengths?.map((strength, idx) => (
+                  {getStrengths().map((strength: string, idx: number) => (
                     <li key={idx} className="flex items-start gap-2 text-sm text-green-800">
                       <span className="text-green-600 mt-0.5">•</span>
                       <span>{strength}</span>
@@ -293,7 +358,7 @@ export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
           )}
 
           {/* Concerns */}
-          {insight.ai_analysis?.concerns?.length > 0 && (
+          {getConcerns().length > 0 && (
             <Card className="border-orange-200 bg-orange-50/30">
               <div className="p-5">
                 <div className="flex items-center gap-2 mb-3">
@@ -301,7 +366,7 @@ export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
                   <h4 className="font-semibold text-orange-900">Bedenken</h4>
                 </div>
                 <ul className="space-y-2 max-h-40 overflow-y-auto">
-                  {insight.ai_analysis?.concerns?.map((concern, idx) => (
+                  {getConcerns().map((concern: string, idx: number) => (
                     <li key={idx} className="flex items-start gap-2 text-sm text-orange-800">
                       <span className="text-orange-600 mt-0.5">•</span>
                       <span>{concern}</span>
@@ -323,9 +388,9 @@ export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
               Hauptgründer & LinkedIn-Follower
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {insight.founders.map((founder, idx) => (
-                <div 
-                  key={idx} 
+              {insight.founders.map((founder: any, idx: number) => (
+                <div
+                  key={idx}
                   className="bg-white rounded-lg p-4 border border-blue-100 hover:border-blue-300 transition-all hover:shadow-md"
                 >
                   <div className="flex items-start justify-between mb-3">
@@ -341,7 +406,7 @@ export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
                     </div>
                     <Linkedin className="w-5 h-5 text-blue-600 flex-shrink-0" />
                   </div>
-                  
+
                   {founder.linkedin_followers != null ? (
                     <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-md p-3">
                       <div className="text-xs text-muted-foreground mb-1">
@@ -365,7 +430,7 @@ export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
                       Keine Follower-Daten verfügbar
                     </div>
                   )}
-                  
+
                   {founder.linkedin_url && (
                     <a
                       href={founder.linkedin_url}
@@ -396,7 +461,7 @@ export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
               <BarChart3 className="w-5 h-5 text-blue-600" />
               Geschäftskennzahlen
             </h4>
-            
+
             {/* Exact Team Size - Prominently displayed */}
             {insight.business_metrics.team_size !== undefined && (
               <div className="mb-6 p-4 bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg border border-blue-200">
@@ -411,9 +476,9 @@ export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
                       <div className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
                         <span>Quelle:</span>
                         <Badge variant="outline" className="text-xs">
-                          {insight.business_metrics.team_size_source === 'website' ? 'Website' : 
-                           insight.business_metrics.team_size_source === 'linkedin' ? 'LinkedIn' : 
-                           'Unbekannt'}
+                          {insight.business_metrics.team_size_source === 'website' ? 'Website' :
+                            insight.business_metrics.team_size_source === 'linkedin' ? 'LinkedIn' :
+                              insight.business_metrics.team_size_source}
                         </Badge>
                       </div>
                     )}
@@ -422,60 +487,92 @@ export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
                 </div>
               </div>
             )}
-            
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="space-y-1">
-                <div className="text-xs text-muted-foreground">Umsatztrend</div>
-                <div className="text-sm font-medium">
-                  {insight.business_metrics.estimated_revenue_trend === 'growing' ? '📈 Wachsend' : 
-                   insight.business_metrics.estimated_revenue_trend === 'stable' ? '➡️ Stabil' :
-                   insight.business_metrics.estimated_revenue_trend === 'declining' ? '📉 Rückläufig' :
-                   'Unbekannt'}
+
+            {/* New Enriched Metrics */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Funding Status */}
+              {insight.business_metrics.funding_status && insight.business_metrics.funding_status !== 'unknown' && (
+                <div className="space-y-2 p-3 bg-green-50/50 rounded-lg border border-green-100">
+                  <div className="text-xs text-muted-foreground flex items-center gap-1">
+                    <DollarSign className="w-3 h-3" />
+                    Finanzierung
+                  </div>
+                  <div className="text-sm font-medium">
+                    {insight.business_metrics.funding_status === 'seed_funded' ? '🌱 Seed-Finanziert' :
+                      insight.business_metrics.funding_status === 'series_a' ? '💰 Series A' :
+                        insight.business_metrics.funding_status === 'series_b' ? '💰💰 Series B' :
+                          insight.business_metrics.funding_status === 'angel_funded' ? '👼 Angel-Finanziert' :
+                            insight.business_metrics.funding_status === 'acquired' ? '🎯 Übernommen' :
+                              insight.business_metrics.funding_status === 'bootstrapped' ? '🚀 Bootstrapped' :
+                                insight.business_metrics.funding_status === 'funded' ? '💵 Finanziert' :
+                                  insight.business_metrics.funding_status}
+                  </div>
                 </div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-xs text-muted-foreground">Teamgröße</div>
-                <div className="text-sm font-medium">
-                  {insight.business_metrics.team_size ? `${insight.business_metrics.team_size} Mitarbeiter` : 
-                   insight.business_metrics.team_size_trend === 'growing' ? '📈 Wachsend' :
-                   insight.business_metrics.team_size_trend === 'stable' ? '➡️ Stabil' :
-                   insight.business_metrics.team_size_trend === 'declining' ? '📉 Schrumpfend' :
-                   'Unbekannt'}
+              )}
+
+              {/* Last Activity Date */}
+              {insight.business_metrics.last_activity_date && (
+                <div className="space-y-2 p-3 bg-blue-50/50 rounded-lg border border-blue-100">
+                  <div className="text-xs text-muted-foreground flex items-center gap-1">
+                    <Calendar className="w-3 h-3" />
+                    Letzte Aktivität
+                  </div>
+                  <div className="text-sm font-medium">
+                    {formatDate(insight.business_metrics.last_activity_date)}
+                  </div>
                 </div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-xs text-muted-foreground">Marktpräsenz</div>
-                <div className="text-sm font-medium">
-                  {insight.business_metrics.market_presence === 'strong' ? '💪 Stark' :
-                   insight.business_metrics.market_presence === 'moderate' ? '👌 Moderat' :
-                   insight.business_metrics.market_presence === 'weak' ? '📊 Schwach' :
-                   'Unbekannt'}
-                </div>
-              </div>
-              <div className="space-y-1">
-                <div className="text-xs text-muted-foreground">Finanzierung</div>
-                <div className="text-sm font-medium">
-                  {insight.business_metrics.funding_status === 'well-funded' ? '💰 Gut finanziert' :
-                   insight.business_metrics.funding_status === 'bootstrapped' ? '🚀 Bootstrapped' :
-                   insight.business_metrics.funding_status === 'seeking' ? '🔍 Auf der Suche' :
-                   'Unbekannt'}
-                </div>
-              </div>
+              )}
             </div>
+
+            {/* Awards */}
+            {insight.business_metrics.awards && insight.business_metrics.awards.length > 0 && (
+              <div className="mt-4 p-3 bg-amber-50/50 rounded-lg border border-amber-100">
+                <div className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
+                  <Award className="w-3 h-3" />
+                  Auszeichnungen ({insight.business_metrics.awards.length})
+                </div>
+                <ul className="space-y-1">
+                  {insight.business_metrics.awards.map((award: string, idx: number) => (
+                    <li key={idx} className="text-sm flex items-start gap-2">
+                      <span className="text-amber-600 mt-0.5">🏆</span>
+                      <span>{award}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Key Partnerships */}
+            {insight.business_metrics.key_partnerships && insight.business_metrics.key_partnerships.length > 0 && (
+              <div className="mt-4 p-3 bg-purple-50/50 rounded-lg border border-purple-100">
+                <div className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
+                  <Users className="w-3 h-3" />
+                  Partnerschaften ({insight.business_metrics.key_partnerships.length})
+                </div>
+                <ul className="space-y-1">
+                  {insight.business_metrics.key_partnerships.map((partnership: string, idx: number) => (
+                    <li key={idx} className="text-sm flex items-start gap-2">
+                      <span className="text-purple-600 mt-0.5">🤝</span>
+                      <span>{partnership}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         </Card>
       )}
 
       {/* Updates Timeline */}
-      {insight.updates?.length > 0 && (
+      {getUpdates().length > 0 && (
         <Card>
           <div className="p-5">
             <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-purple-600" />
-              Kürzliche Updates ({insight.updates?.length})
+              Kürzliche Updates ({getUpdates().length})
             </h4>
             <div className="space-y-4">
-              {insight.updates?.map((update, idx) => (
+              {getUpdates().map((update: any, idx: number) => (
                 <div key={idx} className="border-l-2 border-purple-200 pl-4 pb-4 last:pb-0">
                   <div className="flex items-start justify-between gap-4 mb-2">
                     <div className="flex-1">
@@ -506,9 +603,9 @@ export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
                       </div>
                     </div>
                   </div>
-                  <a 
-                    href={update.source} 
-                    target="_blank" 
+                  <a
+                    href={update.source}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1 mt-2 hover:underline"
                   >
@@ -537,18 +634,18 @@ export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
                 </p>
               </div>
             )}
-            
+
             {insight.sources_checked && insight.sources_checked.length > 0 && (
               <div>
                 <h5 className="text-xs font-medium text-gray-700 mb-2">
                   Geprüfte Quellen ({insight.sources_checked.length})
                 </h5>
                 <div className="flex flex-wrap gap-2">
-                  {insight.sources_checked.slice(0, 5).map((source, idx) => {
+                  {insight.sources_checked.slice(0, 5).map((source: string, idx: number) => {
                     // Check if source is a valid URL
                     let displayText = source
                     let isValidUrl = false
-                    
+
                     try {
                       const url = new URL(source)
                       displayText = url.hostname.replace('www.', '')
@@ -557,7 +654,7 @@ export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
                       // Not a valid URL, just display as text
                       displayText = source
                     }
-                    
+
                     return isValidUrl ? (
                       <a
                         key={idx}

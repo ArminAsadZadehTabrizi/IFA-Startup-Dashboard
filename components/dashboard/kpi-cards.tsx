@@ -9,6 +9,10 @@ interface KPICardsProps {
 export function KPICards({ startups, crawlRuns }: KPICardsProps) {
   const totalStartups = startups.length
 
+  // Count startups by organization (program)
+  const ifiCount = startups.filter(s => s.organization === "IFI").length
+  const ifaCount = startups.filter(s => s.organization === "IFA").length
+
   // Count startups by program phase
   const phaseCounts = startups.reduce(
     (acc, startup) => {
@@ -35,7 +39,7 @@ export function KPICards({ startups, crawlRuns }: KPICardsProps) {
       title: "Startups Gesamt",
       value: totalStartups.toString(),
       icon: "👥",
-      trend: `Mit Programmphase: ${Object.values(phaseCounts).reduce((a, b) => a + b, 0)}`,
+      trend: `${ifiCount} aus IFI • ${ifaCount} aus IFA`,
       color: "text-primary",
       bgColor: "bg-primary/5",
     },

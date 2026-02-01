@@ -69,10 +69,10 @@ export function FeedbackButton() {
 
   return (
     <>
-      {/* Floating Action Button */}
+      {/* Floating Action Button - positioned to left of chatbot */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 font-medium z-40 group"
+        className="fixed bottom-6 right-24 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 font-medium z-40 group"
         aria-label="Feedback geben"
       >
         <span className="text-xl">💬</span>

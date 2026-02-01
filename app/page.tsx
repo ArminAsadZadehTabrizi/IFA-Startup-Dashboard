@@ -8,12 +8,14 @@ import { KPICards } from "@/components/dashboard/kpi-cards"
 import { ChartsSection } from "@/components/dashboard/charts-section"
 import { FilterBar } from "@/components/dashboard/filter-bar"
 import { StartupsTable } from "@/components/dashboard/startups-table"
-import { DataQualitySection } from "@/components/dashboard/data-quality-section"
 import { CrawlerSimulation } from "@/components/crawler-simulation"
 import { FeedbackButton } from "@/components/feedback-modal"
+import { signOut, useSession } from "next-auth/react"
+import { LogOut } from "lucide-react"
 import Image from "next/image"
 
 export default function DashboardPage() {
+  const { data: session } = useSession()
   const { data: startups, isLoading: startupsLoading, error: startupsError } = useStartups()
   const { data: crawlRuns, isLoading: crawlRunsLoading } = useCrawlRuns()
   const { data: sdgs, isLoading: sdgsLoading } = useSDGs()
@@ -34,6 +36,7 @@ export default function DashboardPage() {
   }, [startups, startupsLoading, startupsError])
 
   const [showCrawlerSimulation, setShowCrawlerSimulation] = useState(false)
+  const [showTable, setShowTable] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
   const [filters, setFilters] = useState({
     batches: [] as string[],
@@ -126,12 +129,26 @@ export default function DashboardPage() {
             </div>
           </div>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
+            {session?.user && (
+              <div className="text-slate-300 text-sm hidden sm:flex items-center gap-2">
+                <span>Angemeldet als: <strong>{session.user.name}</strong></span>
+              </div>
+            )}
             <Button
               variant="outline"
               size="default"
               className="btn-modern bg-transparent border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-white w-full sm:w-auto"
             >
               ↓ Exportieren
+            </Button>
+            <Button
+              variant="outline"
+              size="default"
+              onClick={() => signOut({ callbackUrl: "/login" })}
+              className="btn-modern bg-transparent border-red-600 text-red-300 hover:bg-red-700 hover:text-white w-full sm:w-auto flex items-center gap-2"
+            >
+              <LogOut className="h-4 w-4" />
+              Abmelden
             </Button>
           </div>
         </div>
@@ -149,14 +166,35 @@ export default function DashboardPage() {
           sdgs={sdgs || []}
         />
 
-        {/* Startups Table */}
-        <StartupsTable startups={startups || []} sdgs={sdgs || []} filters={filters} searchQuery={searchQuery} />
+        {/* Startups Table with Toggle */}
+        <div className="relative">
+          {/* Toggle Button */}
+          <Button
+            onClick={() => setShowTable(!showTable)}
+            variant="outline"
+            size="sm"
+            className="absolute -top-12 right-0 z-10 flex items-center gap-2"
+          >
+            {showTable ? (
+              <>
+                <span>Liste ausblenden</span>
+                <span>▲</span>
+              </>
+            ) : (
+              <>
+                <span>Liste anzeigen</span>
+                <span>▼</span>
+              </>
+            )}
+          </Button>
+          
+          {showTable && (
+            <StartupsTable startups={startups || []} sdgs={sdgs || []} filters={filters} searchQuery={searchQuery} />
+          )}
+        </div>
 
         {/* Charts Section */}
         <ChartsSection startups={startups || []} sdgs={sdgs || []} />
-
-        {/* Data Quality Section */}
-        <DataQualitySection startups={startups || []} />
       </div>
 
       <CrawlerSimulation isOpen={showCrawlerSimulation} onClose={() => setShowCrawlerSimulation(false)} />

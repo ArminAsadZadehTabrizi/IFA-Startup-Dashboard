@@ -211,9 +211,9 @@ export function StartupsTable({ startups, sdgs, filters, searchQuery }: Startups
                   className={isStartupColumnFixed ? 'sticky z-30 bg-card shadow-[4px_0_6px_-1px_rgba(0,0,0,0.1)] border-r' : ''}
                   style={isStartupColumnFixed ? { 
                     left: '48px',
-                    width: '220px',
-                    minWidth: '220px'
-                  } : undefined}
+                    width: '160px',
+                    minWidth: '160px'
+                  } : { width: '160px', minWidth: '160px', maxWidth: '180px' }}
                 >Startup</TableHead>
                 <TableHead>Batch</TableHead>
                 <TableHead>Programm</TableHead>
@@ -247,24 +247,21 @@ export function StartupsTable({ startups, sdgs, filters, searchQuery }: Startups
                     className={isStartupColumnFixed ? 'sticky z-20 bg-card shadow-[4px_0_6px_-1px_rgba(0,0,0,0.1)] border-r' : ''}
                     style={isStartupColumnFixed ? {
                       left: '48px',
-                      width: '220px',
-                      minWidth: '220px'
-                    } : undefined}
+                      width: '160px',
+                      minWidth: '160px'
+                    } : { width: '160px', minWidth: '160px', maxWidth: '180px' }}
                   >
                     <button
                       onClick={() => handleViewStartup(startup)}
                       className="flex items-center gap-2 text-left hover:opacity-80 transition-opacity w-full"
                       title="Startup-Details anzeigen"
                     >
-                      <Avatar className="h-8 w-8 flex-shrink-0">
+                      <Avatar className="h-7 w-7 flex-shrink-0">
                         <AvatarImage src={startup.logoUrl || "/placeholder.svg"} alt={startup.name} />
-                        <AvatarFallback>{startup.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+                        <AvatarFallback className="text-xs">{startup.name.substring(0, 2).toUpperCase()}</AvatarFallback>
                       </Avatar>
-                      <div className="min-w-0 flex-1">
-                        <div className="font-medium whitespace-nowrap text-blue-600 hover:underline">{startup.name}</div>
-                        {startup.website && (
-                          <div className="text-xs text-muted-foreground truncate">{startup.website.replace("https://", "").split('/')[0]}</div>
-                        )}
+                      <div className="min-w-0 flex-1 overflow-hidden">
+                        <div className="font-medium text-sm text-blue-600 hover:underline truncate">{startup.name}</div>
                       </div>
                     </button>
                   </TableCell>

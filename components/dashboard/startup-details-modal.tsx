@@ -3,9 +3,8 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ExternalLink, Globe } from "lucide-react"
+import { ExternalLink } from "lucide-react"
 import type { Startup, SDG } from "@/lib/types"
 import { getStatusColor } from "@/lib/utils"
 import { AIInsightsSection } from "@/components/startup/ai-insights-section"
@@ -49,26 +48,7 @@ export function StartupDetailsModal({ startup, sdgs, isOpen, onClose }: StartupD
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Beschreibung */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Globe className="h-5 w-5" />
-                Über das Startup
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="prose prose-sm max-w-none">
-                {startup.description ? (
-                  <p className="text-gray-700 leading-relaxed">{startup.description}</p>
-                ) : (
-                  <p className="text-gray-500 italic">Keine Beschreibung verfügbar</p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* AI-Powered Insights - This is now the main content */}
+          {/* AI-Powered Insights - Main content */}
           <AIInsightsSection startupId={startup.id} />
         </div>
       </DialogContent>

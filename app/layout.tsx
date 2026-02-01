@@ -4,6 +4,7 @@ import { GeistSans } from "geist/font/sans"
 import { GeistMono } from "geist/font/mono"
 import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
+import { SessionProvider } from "next-auth/react"
 import { Chatbot } from "@/components/chatbot"
 import "./globals.css"
 
@@ -21,9 +22,11 @@ export default function RootLayout({
   return (
     <html lang="de">
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
-        <Suspense fallback={null}>{children}</Suspense>
-        <Analytics />
-        <Chatbot />
+        <SessionProvider>
+          <Suspense fallback={null}>{children}</Suspense>
+          <Analytics />
+          <Chatbot />
+        </SessionProvider>
       </body>
     </html>
   )
