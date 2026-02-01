@@ -13,62 +13,108 @@ import type { Startup } from '@/lib/types'
 import type { AIInsight } from './ai-insights-section'
 
 // =============================================================================
-// HELPER FUNCTION: Calculate IFA Health Score
+// LOGIK: IFA HEALTH SCORE (Strenger Algorithmus)
 // =============================================================================
 const calculateHealthScore = (startup: Startup, insight: AIInsight | null): number => {
-  let score = 50 // Base score
+  let score = 50 // Basiswert
 
-  // +20 points if status is 'active'
-  if (startup.status === 'active') {
-    score += 20
+  // Status-Check: Wenn Status NICHT 'active' -> -40 Punkte sofort
+  if (startup.status !== 'active') {
+    score -= 40
   }
 
-  // +10 points if team_size > 1
+  // Team-Check: team_size > 1 -> +10 Punkte
   const teamSize = startup.headcount || insight?.business_metrics?.team_size || 0
   if (teamSize > 1) {
     score += 10
   }
 
-  // +10 points if recent_updates exist (length > 0)
+  // News-Check: updates.length > 0 -> +10 Punkte
   const updates = insight?.updates || []
   if (updates.length > 0) {
     score += 10
   }
 
-  // +10 points if recommendation is 'continue_support'
+  // AI-Check: recommendation === 'continue_support' -> +15 Punkte
   if (insight?.ai_analysis?.recommendation === 'continue_support') {
-    score += 10
+    score += 15
   }
 
-  // -10 points if concerns > 3 entries
+  // Risiko-Check: concerns.length > 2 -> -15 Punkte
   const concerns = insight?.ai_analysis?.concerns || []
-  if (concerns.length > 3) {
-    score -= 10
+  if (concerns.length > 2) {
+    score -= 15
   }
 
-  // Clamp result between 0 and 100
+  // Ergebnis zwischen 0 und 100 begrenzen
   return Math.max(0, Math.min(100, score))
 }
 
 // =============================================================================
-// COLOR PALETTE
+// LOGIK: DAS URTEIL (Verdict)
+// =============================================================================
+type VerdictType = {
+  text: string
+  color: 'gray' | 'green' | 'yellow' | 'red'
+}
+
+const getVerdict = (score: number, status: string): VerdictType => {
+  // Prio 1: Inaktive Status -> ARCHIVIEREN
+  const inactiveStatuses = ['ruhend', 'inactive', 'dormant', 'closed', 'pivoted', 'acquired']
+  if (inactiveStatuses.includes(status.toLowerCase())) {
+    return { text: 'ARCHIVIEREN', color: 'gray' }
+  }
+
+  // Prio 2: Score >= 75 -> TOP KANDIDAT
+  if (score >= 75) {
+    return { text: 'TOP KANDIDAT', color: 'green' }
+  }
+
+  // Prio 3: Score >= 50 -> BEOBACHTEN
+  if (score >= 50) {
+    return { text: 'BEOBACHTEN', color: 'yellow' }
+  }
+
+  // Sonst: PRÜFEN
+  return { text: 'PRÜFEN', color: 'red' }
+}
+
+// =============================================================================
+// FARBPALETTE
 // =============================================================================
 const colors = {
-  // Primary colors
+  // Primärfarben
   darkBlue: '#0f172a',
   navy: '#1e3a5f',
   blue: '#2563eb',
-  lightBlue: '#3b82f6',
   
-  // Accent colors
-  green: '#10b981',
-  greenDark: '#059669',
-  yellow: '#f59e0b',
-  yellowDark: '#d97706',
-  red: '#ef4444',
-  redDark: '#dc2626',
+  // Verdict-Farben
+  verdictGreen: '#166534',
+  verdictGreenBg: '#dcfce7',
+  verdictGreenBorder: '#86efac',
   
-  // Neutrals
+  verdictYellow: '#92400e',
+  verdictYellowBg: '#fef3c7',
+  verdictYellowBorder: '#fcd34d',
+  
+  verdictRed: '#991b1b',
+  verdictRedBg: '#fee2e2',
+  verdictRedBorder: '#fca5a5',
+  
+  verdictGray: '#374151',
+  verdictGrayBg: '#f3f4f6',
+  verdictGrayBorder: '#d1d5db',
+  
+  // Analyse-Farben
+  strengthGreen: '#14532d',
+  strengthBg: '#f0fdf4',
+  strengthBorder: '#22c55e',
+  
+  riskRed: '#7f1d1d',
+  riskBg: '#fef2f2',
+  riskBorder: '#ef4444',
+  
+  // Neutraltöne
   white: '#ffffff',
   gray50: '#f8fafc',
   gray100: '#f1f5f9',
@@ -79,9 +125,8 @@ const colors = {
   gray600: '#475569',
   gray700: '#334155',
   gray800: '#1e293b',
-  gray900: '#0f172a',
   
-  // Sidebar background
+  // Sidebar
   sidebarBg: '#f1f5f9',
 }
 
@@ -89,7 +134,7 @@ const colors = {
 // STYLES
 // =============================================================================
 const styles = StyleSheet.create({
-  // Page Layout
+  // Seiten-Layout
   page: {
     fontFamily: 'Helvetica',
     fontSize: 9,
@@ -102,7 +147,7 @@ const styles = StyleSheet.create({
   },
   
   // ===================
-  // LEFT SIDEBAR (30%)
+  // LINKE SIDEBAR (30%)
   // ===================
   sidebar: {
     width: '30%',
@@ -111,7 +156,7 @@ const styles = StyleSheet.create({
     paddingBottom: 50,
   },
   
-  // Score Circle
+  // Score-Kreis
   scoreContainer: {
     alignItems: 'center',
     marginBottom: 24,
@@ -139,8 +184,8 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   
-  // Key Facts Section
-  keyFactsTitle: {
+  // Fakten-Liste
+  factsTitle: {
     fontSize: 11,
     fontWeight: 'bold',
     color: colors.darkBlue,
@@ -173,7 +218,7 @@ const styles = StyleSheet.create({
     textDecoration: 'none',
   },
   
-  // Status Badge
+  // Status-Badge
   statusBadge: {
     paddingHorizontal: 8,
     paddingVertical: 4,
@@ -185,7 +230,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#dcfce7',
   },
   statusInactive: {
-    backgroundColor: '#fef3c7',
+    backgroundColor: '#f3f4f6',
   },
   statusText: {
     fontSize: 9,
@@ -195,11 +240,11 @@ const styles = StyleSheet.create({
     color: '#166534',
   },
   statusTextInactive: {
-    color: '#92400e',
+    color: '#374151',
   },
   
   // ===================
-  // RIGHT MAIN AREA (70%)
+  // RECHTER HAUPTBEREICH (70%)
   // ===================
   mainContent: {
     width: '70%',
@@ -211,15 +256,15 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 20,
-    paddingBottom: 16,
+    marginBottom: 18,
+    paddingBottom: 14,
     borderBottomWidth: 3,
     borderBottomColor: colors.darkBlue,
   },
   logoContainer: {
-    width: 50,
-    height: 50,
-    marginRight: 14,
+    width: 48,
+    height: 48,
+    marginRight: 12,
     backgroundColor: colors.gray100,
     borderRadius: 6,
     justifyContent: 'center',
@@ -228,12 +273,12 @@ const styles = StyleSheet.create({
     borderColor: colors.gray200,
   },
   logo: {
-    width: 42,
-    height: 42,
+    width: 40,
+    height: 40,
     objectFit: 'contain',
   },
   logoFallback: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     color: colors.darkBlue,
   },
@@ -241,75 +286,66 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   startupName: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: 'bold',
     color: colors.darkBlue,
     marginBottom: 4,
   },
   startupTagline: {
-    fontSize: 10,
+    fontSize: 9,
     color: colors.gray600,
     lineHeight: 1.4,
   },
   
-  // Section Styles
+  // Abschnitt-Styles
   section: {
-    marginBottom: 16,
+    marginBottom: 14,
   },
   sectionTitle: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: 'bold',
     color: colors.darkBlue,
-    marginBottom: 8,
+    marginBottom: 6,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
-  sectionContent: {
-    fontSize: 9,
-    color: colors.gray700,
-    lineHeight: 1.6,
-  },
   
-  // Executive Summary Box
+  // Zusammenfassung
   summaryBox: {
     backgroundColor: colors.gray50,
-    padding: 12,
-    borderRadius: 6,
+    padding: 10,
+    borderRadius: 5,
     borderLeftWidth: 3,
     borderLeftColor: colors.blue,
   },
   summaryText: {
     fontSize: 9,
     color: colors.gray700,
-    lineHeight: 1.7,
+    lineHeight: 1.6,
   },
   
-  // Verdict Box
+  // Fazit-Box (Verdict)
   verdictBox: {
     padding: 12,
     borderRadius: 6,
-    marginBottom: 4,
     alignItems: 'center',
-  },
-  verdictGreen: {
-    backgroundColor: '#dcfce7',
     borderWidth: 1,
-    borderColor: '#86efac',
   },
-  verdictYellow: {
-    backgroundColor: '#fef3c7',
-    borderWidth: 1,
-    borderColor: '#fcd34d',
+  verdictBoxGreen: {
+    backgroundColor: colors.verdictGreenBg,
+    borderColor: colors.verdictGreenBorder,
   },
-  verdictRed: {
-    backgroundColor: '#fee2e2',
-    borderWidth: 1,
-    borderColor: '#fca5a5',
+  verdictBoxYellow: {
+    backgroundColor: colors.verdictYellowBg,
+    borderColor: colors.verdictYellowBorder,
   },
-  verdictGray: {
-    backgroundColor: colors.gray100,
-    borderWidth: 1,
-    borderColor: colors.gray300,
+  verdictBoxRed: {
+    backgroundColor: colors.verdictRedBg,
+    borderColor: colors.verdictRedBorder,
+  },
+  verdictBoxGray: {
+    backgroundColor: colors.verdictGrayBg,
+    borderColor: colors.verdictGrayBorder,
   },
   verdictLabel: {
     fontSize: 8,
@@ -318,115 +354,94 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
-  verdictLabelGreen: {
-    color: '#166534',
-  },
-  verdictLabelYellow: {
-    color: '#92400e',
-  },
-  verdictLabelRed: {
-    color: '#991b1b',
-  },
-  verdictLabelGray: {
-    color: colors.gray600,
-  },
+  verdictLabelGreen: { color: colors.verdictGreen },
+  verdictLabelYellow: { color: colors.verdictYellow },
+  verdictLabelRed: { color: colors.verdictRed },
+  verdictLabelGray: { color: colors.verdictGray },
   verdictText: {
     fontSize: 14,
     fontWeight: 'bold',
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
-  verdictTextGreen: {
-    color: '#166534',
+  verdictTextGreen: { color: colors.verdictGreen },
+  verdictTextYellow: { color: colors.verdictYellow },
+  verdictTextRed: { color: colors.verdictRed },
+  verdictTextGray: { color: colors.verdictGray },
+  
+  // Investment Case
+  investmentCaseBox: {
+    backgroundColor: '#eff6ff',
+    padding: 10,
+    borderRadius: 5,
+    borderLeftWidth: 3,
+    borderLeftColor: colors.navy,
   },
-  verdictTextYellow: {
-    color: '#92400e',
-  },
-  verdictTextRed: {
-    color: '#991b1b',
-  },
-  verdictTextGray: {
-    color: colors.gray600,
-  },
-  confidenceText: {
-    fontSize: 8,
-    color: colors.gray500,
-    marginTop: 4,
+  investmentCaseText: {
+    fontSize: 9,
+    color: colors.gray700,
+    lineHeight: 1.5,
   },
   
-  // Analysis Two Columns
+  // Analyse-Spalten
   analysisColumns: {
     flexDirection: 'row',
-    gap: 12,
+    gap: 10,
   },
   analysisColumn: {
     flex: 1,
   },
   strengthsBox: {
-    backgroundColor: '#f0fdf4',
+    backgroundColor: colors.strengthBg,
     padding: 10,
-    borderRadius: 6,
+    borderRadius: 5,
     borderLeftWidth: 3,
-    borderLeftColor: colors.green,
-    height: '100%',
+    borderLeftColor: colors.strengthBorder,
+    minHeight: 70,
   },
-  concernsBox: {
-    backgroundColor: '#fffbeb',
+  risksBox: {
+    backgroundColor: colors.riskBg,
     padding: 10,
-    borderRadius: 6,
+    borderRadius: 5,
     borderLeftWidth: 3,
-    borderLeftColor: colors.yellow,
-    height: '100%',
+    borderLeftColor: colors.riskBorder,
+    minHeight: 70,
   },
   analysisTitle: {
     fontSize: 9,
     fontWeight: 'bold',
     marginBottom: 6,
-    textTransform: 'uppercase',
-    letterSpacing: 0.3,
   },
-  strengthsTitle: {
-    color: '#166534',
-  },
-  concernsTitle: {
-    color: '#92400e',
-  },
+  strengthsTitle: { color: colors.strengthGreen },
+  risksTitle: { color: colors.riskRed },
   bulletItem: {
     flexDirection: 'row',
-    marginBottom: 4,
+    marginBottom: 3,
   },
   bulletPoint: {
-    width: 12,
+    width: 10,
     fontSize: 8,
   },
-  bulletPointGreen: {
-    color: colors.green,
-  },
-  bulletPointYellow: {
-    color: colors.yellow,
-  },
+  bulletPointGreen: { color: colors.strengthBorder },
+  bulletPointRed: { color: colors.riskBorder },
   bulletText: {
     flex: 1,
     fontSize: 8,
-    lineHeight: 1.5,
+    lineHeight: 1.4,
   },
-  bulletTextGreen: {
-    color: '#14532d',
-  },
-  bulletTextYellow: {
-    color: '#78350f',
-  },
+  bulletTextGreen: { color: colors.strengthGreen },
+  bulletTextRed: { color: colors.riskRed },
   
-  // Traction / Updates
+  // Aktuelles (Updates)
   updateItem: {
     flexDirection: 'row',
-    marginBottom: 8,
-    paddingBottom: 8,
+    marginBottom: 6,
+    paddingBottom: 6,
     borderBottomWidth: 1,
     borderBottomColor: colors.gray200,
   },
   updateDate: {
-    width: 55,
+    width: 50,
     fontSize: 8,
     color: colors.gray500,
     fontWeight: 'bold',
@@ -435,20 +450,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   updateTitle: {
-    fontSize: 9,
+    fontSize: 8,
     fontWeight: 'bold',
     color: colors.gray800,
-    marginBottom: 2,
-  },
-  updateDescription: {
-    fontSize: 8,
-    color: colors.gray600,
-    lineHeight: 1.4,
   },
   
-  // No Data
+  // Keine Daten
   noData: {
-    fontSize: 9,
+    fontSize: 8,
     color: colors.gray400,
     fontStyle: 'italic',
   },
@@ -462,7 +471,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 24,
   },
   footerText: {
     fontSize: 7,
@@ -472,20 +480,10 @@ const styles = StyleSheet.create({
 })
 
 // =============================================================================
-// HELPER FUNCTIONS
+// HILFSFUNKTIONEN
 // =============================================================================
-const formatDate = (dateStr: string): string => {
-  try {
-    return new Date(dateStr).toLocaleDateString('de-DE', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    })
-  } catch {
-    return dateStr
-  }
-}
 
+// Datum formatieren (kurz)
 const formatShortDate = (dateStr: string): string => {
   try {
     return new Date(dateStr).toLocaleDateString('de-DE', {
@@ -497,38 +495,56 @@ const formatShortDate = (dateStr: string): string => {
   }
 }
 
-const getStatusText = (status: string): string => {
-  switch (status) {
+// Status auf Deutsch übersetzen
+const getStatusTextDE = (status: string): string => {
+  switch (status.toLowerCase()) {
     case 'active':
-      return 'AKTIV'
+      return 'Aktiv'
     case 'dormant':
-      return 'RUHEND'
+    case 'inactive':
+      return 'Ruhend'
     case 'acquired':
-      return 'ÜBERNOMMEN'
+      return 'Übernommen'
     case 'pivoted':
-      return 'PIVOT'
+      return 'Pivot'
+    case 'closed':
+      return 'Geschlossen'
     default:
-      return status.toUpperCase()
+      return status
   }
 }
 
-const getRecommendationDisplay = (rec: string): { text: string; type: 'green' | 'yellow' | 'red' | 'gray' } => {
-  switch (rec) {
-    case 'continue_support':
-      return { text: 'INVESTIEREN', type: 'green' }
-    case 'monitor':
-      return { text: 'BEOBACHTEN', type: 'yellow' }
-    case 'alumni_inactive':
-      return { text: 'INAKTIV', type: 'red' }
-    case 'insufficient_data':
-      return { text: 'DATEN FEHLEN', type: 'gray' }
-    default:
-      return { text: rec.toUpperCase(), type: 'gray' }
+// Investment Case Text generieren
+const generateInvestmentCase = (score: number, startup: Startup, insight: AIInsight | null): string => {
+  const statusDE = getStatusTextDE(startup.status)
+  const teamSize = startup.headcount || insight?.business_metrics?.team_size || 0
+  const updatesCount = insight?.updates?.length || 0
+  
+  let conclusion = ''
+  
+  if (score >= 75) {
+    conclusion = 'zeigt das Startup starke Entwicklungsindikatoren und ist ein vielversprechender Kandidat für weiteres Engagement.'
+  } else if (score >= 50) {
+    conclusion = 'empfehlen wir eine regelmäßige Beobachtung der weiteren Entwicklung.'
+  } else if (startup.status !== 'active') {
+    conclusion = `befindet sich das Startup im Status "${statusDE}" und sollte für eine mögliche Archivierung geprüft werden.`
+  } else {
+    conclusion = 'sind weitere Informationen erforderlich, um eine fundierte Einschätzung abzugeben.'
   }
+  
+  let details = ''
+  if (teamSize > 0) {
+    details += ` Das Team umfasst ${teamSize} Mitarbeiter.`
+  }
+  if (updatesCount > 0) {
+    details += ` Es wurden ${updatesCount} aktuelle Entwicklungen erfasst.`
+  }
+  
+  return `Dieses Startup erzielt einen Health Score von ${score}/100. Basierend auf den verfügbaren Daten ${conclusion}${details}`
 }
 
 // =============================================================================
-// COMPONENT PROPS
+// KOMPONENTEN-PROPS
 // =============================================================================
 interface StartupPDFDocumentProps {
   startup: Startup
@@ -536,41 +552,31 @@ interface StartupPDFDocumentProps {
 }
 
 // =============================================================================
-// MAIN COMPONENT
+// HAUPTKOMPONENTE
 // =============================================================================
 export function StartupPDFDocument({ startup, insight }: StartupPDFDocumentProps) {
+  // Aktuelles Datum
   const currentDate = new Date().toLocaleDateString('de-DE', {
     day: '2-digit',
     month: 'long',
     year: 'numeric',
   })
 
-  // Calculate Health Score
+  // Health Score berechnen
   const healthScore = calculateHealthScore(startup, insight)
+  
+  // Verdict ermitteln
+  const verdict = getVerdict(healthScore, startup.status)
 
-  // Helper functions to extract data
-  const getAISummary = (): string =>
+  // Daten extrahieren
+  const getSummary = (): string =>
     insight?.german_summary || insight?.ai_analysis?.summary || ''
 
-  const getStrengths = (): string[] => {
-    if (insight?.ai_analysis?.strengths && insight.ai_analysis.strengths.length > 0) {
-      return insight.ai_analysis.strengths.slice(0, 4)
-    }
-    return []
-  }
+  const getStrengths = (): string[] =>
+    insight?.ai_analysis?.strengths?.slice(0, 4) || []
 
-  const getConcerns = (): string[] => {
-    if (insight?.ai_analysis?.concerns && insight.ai_analysis.concerns.length > 0) {
-      return insight.ai_analysis.concerns.slice(0, 4)
-    }
-    return []
-  }
-
-  const getRecommendation = (): string =>
-    insight?.ai_analysis?.recommendation || 'insufficient_data'
-
-  const getConfidenceScore = (): number =>
-    insight?.ai_analysis?.confidence_score || 0
+  const getRisks = (): string[] =>
+    insight?.ai_analysis?.concerns?.slice(0, 4) || []
 
   const getUpdates = () =>
     (insight?.updates || []).slice(0, 3)
@@ -580,15 +586,43 @@ export function StartupPDFDocument({ startup, insight }: StartupPDFDocumentProps
     return size ? `${size} Mitarbeiter` : 'Keine Angabe'
   }
 
-  const recommendation = getRecommendationDisplay(getRecommendation())
-  const confidence = getConfidenceScore()
+  // Investment Case generieren
+  const investmentCase = generateInvestmentCase(healthScore, startup, insight)
+
+  // Verdict-Styles basierend auf Farbe
+  const getVerdictBoxStyle = () => {
+    switch (verdict.color) {
+      case 'green': return styles.verdictBoxGreen
+      case 'yellow': return styles.verdictBoxYellow
+      case 'red': return styles.verdictBoxRed
+      default: return styles.verdictBoxGray
+    }
+  }
+  
+  const getVerdictLabelStyle = () => {
+    switch (verdict.color) {
+      case 'green': return styles.verdictLabelGreen
+      case 'yellow': return styles.verdictLabelYellow
+      case 'red': return styles.verdictLabelRed
+      default: return styles.verdictLabelGray
+    }
+  }
+  
+  const getVerdictTextStyle = () => {
+    switch (verdict.color) {
+      case 'green': return styles.verdictTextGreen
+      case 'yellow': return styles.verdictTextYellow
+      case 'red': return styles.verdictTextRed
+      default: return styles.verdictTextGray
+    }
+  }
 
   return (
     <Document>
       <Page size="A4" style={styles.page}>
         <View style={styles.container}>
           {/* ============================================= */}
-          {/* LEFT SIDEBAR */}
+          {/* LINKE SIDEBAR */}
           {/* ============================================= */}
           <View style={styles.sidebar}>
             {/* IFA Health Score */}
@@ -599,10 +633,10 @@ export function StartupPDFDocument({ startup, insight }: StartupPDFDocumentProps
               <Text style={styles.scoreLabel}>Health Score</Text>
             </View>
 
-            {/* Key Facts */}
-            <Text style={styles.keyFactsTitle}>Key Facts</Text>
+            {/* Fakten */}
+            <Text style={styles.factsTitle}>Fakten</Text>
 
-            {/* Batch / Year */}
+            {/* Batch / Jahr */}
             <View style={styles.factItem}>
               <Text style={styles.factLabel}>Batch / Jahr</Text>
               <Text style={styles.factValue}>
@@ -610,7 +644,7 @@ export function StartupPDFDocument({ startup, insight }: StartupPDFDocumentProps
               </Text>
             </View>
 
-            {/* Sector */}
+            {/* Sektor */}
             <View style={styles.factItem}>
               <Text style={styles.factLabel}>Sektor</Text>
               <Text style={styles.factValue}>
@@ -618,13 +652,13 @@ export function StartupPDFDocument({ startup, insight }: StartupPDFDocumentProps
               </Text>
             </View>
 
-            {/* Team Size */}
+            {/* Teamgröße */}
             <View style={styles.factItem}>
               <Text style={styles.factLabel}>Teamgröße</Text>
               <Text style={styles.factValue}>{getTeamSize()}</Text>
             </View>
 
-            {/* Website */}
+            {/* Webseite */}
             <View style={styles.factItem}>
               <Text style={styles.factLabel}>Webseite</Text>
               {startup.website ? (
@@ -636,7 +670,7 @@ export function StartupPDFDocument({ startup, insight }: StartupPDFDocumentProps
               )}
             </View>
 
-            {/* Location */}
+            {/* Standort */}
             <View style={styles.factItem}>
               <Text style={styles.factLabel}>Standort</Text>
               <Text style={styles.factValue}>
@@ -663,12 +697,12 @@ export function StartupPDFDocument({ startup, insight }: StartupPDFDocumentProps
                       : styles.statusTextInactive,
                   ]}
                 >
-                  {getStatusText(startup.status)}
+                  {getStatusTextDE(startup.status)}
                 </Text>
               </View>
             </View>
 
-            {/* Organization */}
+            {/* Organisation */}
             {startup.organization && (
               <View style={styles.factItem}>
                 <Text style={styles.factLabel}>Organisation</Text>
@@ -678,10 +712,10 @@ export function StartupPDFDocument({ startup, insight }: StartupPDFDocumentProps
           </View>
 
           {/* ============================================= */}
-          {/* RIGHT MAIN CONTENT */}
+          {/* RECHTER HAUPTBEREICH */}
           {/* ============================================= */}
           <View style={styles.mainContent}>
-            {/* Header with Name & Logo */}
+            {/* Header */}
             <View style={styles.header}>
               <View style={styles.logoContainer}>
                 {startup.logoUrl ? (
@@ -703,129 +737,92 @@ export function StartupPDFDocument({ startup, insight }: StartupPDFDocumentProps
               </View>
             </View>
 
-            {/* Executive Summary */}
+            {/* Zusammenfassung */}
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Executive Summary</Text>
-              {getAISummary() ? (
+              <Text style={styles.sectionTitle}>Zusammenfassung</Text>
+              {getSummary() ? (
                 <View style={styles.summaryBox}>
-                  <Text style={styles.summaryText}>{getAISummary()}</Text>
+                  <Text style={styles.summaryText}>{getSummary()}</Text>
                 </View>
               ) : (
-                <Text style={styles.noData}>
-                  Keine KI-Zusammenfassung verfügbar.
-                </Text>
+                <View style={styles.summaryBox}>
+                  <Text style={styles.noData}>Keine Zusammenfassung verfügbar.</Text>
+                </View>
               )}
             </View>
 
-            {/* The Verdict */}
+            {/* Das Fazit */}
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>The Verdict</Text>
-              <View
-                style={[
-                  styles.verdictBox,
-                  recommendation.type === 'green'
-                    ? styles.verdictGreen
-                    : recommendation.type === 'yellow'
-                    ? styles.verdictYellow
-                    : recommendation.type === 'red'
-                    ? styles.verdictRed
-                    : styles.verdictGray,
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.verdictLabel,
-                    recommendation.type === 'green'
-                      ? styles.verdictLabelGreen
-                      : recommendation.type === 'yellow'
-                      ? styles.verdictLabelYellow
-                      : recommendation.type === 'red'
-                      ? styles.verdictLabelRed
-                      : styles.verdictLabelGray,
-                  ]}
-                >
+              <Text style={styles.sectionTitle}>Das Fazit</Text>
+              <View style={[styles.verdictBox, getVerdictBoxStyle()]}>
+                <Text style={[styles.verdictLabel, getVerdictLabelStyle()]}>
                   Empfehlung
                 </Text>
-                <Text
-                  style={[
-                    styles.verdictText,
-                    recommendation.type === 'green'
-                      ? styles.verdictTextGreen
-                      : recommendation.type === 'yellow'
-                      ? styles.verdictTextYellow
-                      : recommendation.type === 'red'
-                      ? styles.verdictTextRed
-                      : styles.verdictTextGray,
-                  ]}
-                >
-                  {recommendation.text}
+                <Text style={[styles.verdictText, getVerdictTextStyle()]}>
+                  {verdict.text}
                 </Text>
-                {confidence > 0 && (
-                  <Text style={styles.confidenceText}>
-                    Vertrauenswert:{' '}
-                    {confidence > 100 ? Math.round(confidence / 100) : Math.round(confidence)}%
-                  </Text>
-                )}
               </View>
             </View>
 
-            {/* Analysis: Strengths & Concerns */}
-            {(getStrengths().length > 0 || getConcerns().length > 0) && (
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Analysis</Text>
-                <View style={styles.analysisColumns}>
-                  {/* Strengths Column */}
-                  <View style={styles.analysisColumn}>
-                    <View style={styles.strengthsBox}>
-                      <Text style={[styles.analysisTitle, styles.strengthsTitle]}>
-                        ✓ Stärken
-                      </Text>
-                      {getStrengths().length > 0 ? (
-                        getStrengths().map((strength, idx) => (
-                          <View key={idx} style={styles.bulletItem}>
-                            <Text style={[styles.bulletPoint, styles.bulletPointGreen]}>
-                              •
-                            </Text>
-                            <Text style={[styles.bulletText, styles.bulletTextGreen]}>
-                              {strength}
-                            </Text>
-                          </View>
-                        ))
-                      ) : (
-                        <Text style={styles.noData}>Keine Stärken erfasst</Text>
-                      )}
-                    </View>
-                  </View>
+            {/* Investment Case */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Investment Case</Text>
+              <View style={styles.investmentCaseBox}>
+                <Text style={styles.investmentCaseText}>{investmentCase}</Text>
+              </View>
+            </View>
 
-                  {/* Concerns Column */}
-                  <View style={styles.analysisColumn}>
-                    <View style={styles.concernsBox}>
-                      <Text style={[styles.analysisTitle, styles.concernsTitle]}>
-                        ! Bedenken
-                      </Text>
-                      {getConcerns().length > 0 ? (
-                        getConcerns().map((concern, idx) => (
-                          <View key={idx} style={styles.bulletItem}>
-                            <Text style={[styles.bulletPoint, styles.bulletPointYellow]}>
-                              •
-                            </Text>
-                            <Text style={[styles.bulletText, styles.bulletTextYellow]}>
-                              {concern}
-                            </Text>
-                          </View>
-                        ))
-                      ) : (
-                        <Text style={styles.noData}>Keine Bedenken erfasst</Text>
-                      )}
-                    </View>
+            {/* Analyse: Stärken & Risiken */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Analyse</Text>
+              <View style={styles.analysisColumns}>
+                {/* Stärken */}
+                <View style={styles.analysisColumn}>
+                  <View style={styles.strengthsBox}>
+                    <Text style={[styles.analysisTitle, styles.strengthsTitle]}>
+                      ✓ Stärken
+                    </Text>
+                    {getStrengths().length > 0 ? (
+                      getStrengths().map((strength, idx) => (
+                        <View key={idx} style={styles.bulletItem}>
+                          <Text style={[styles.bulletPoint, styles.bulletPointGreen]}>•</Text>
+                          <Text style={[styles.bulletText, styles.bulletTextGreen]}>
+                            {strength}
+                          </Text>
+                        </View>
+                      ))
+                    ) : (
+                      <Text style={styles.noData}>Keine Stärken erfasst</Text>
+                    )}
+                  </View>
+                </View>
+
+                {/* Risiken */}
+                <View style={styles.analysisColumn}>
+                  <View style={styles.risksBox}>
+                    <Text style={[styles.analysisTitle, styles.risksTitle]}>
+                      ! Risiken
+                    </Text>
+                    {getRisks().length > 0 ? (
+                      getRisks().map((risk, idx) => (
+                        <View key={idx} style={styles.bulletItem}>
+                          <Text style={[styles.bulletPoint, styles.bulletPointRed]}>•</Text>
+                          <Text style={[styles.bulletText, styles.bulletTextRed]}>
+                            {risk}
+                          </Text>
+                        </View>
+                      ))
+                    ) : (
+                      <Text style={styles.noData}>Keine Risiken gefunden</Text>
+                    )}
                   </View>
                 </View>
               </View>
-            )}
+            </View>
 
-            {/* Recent Traction */}
+            {/* Aktuelle Entwicklungen */}
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Recent Traction</Text>
+              <Text style={styles.sectionTitle}>Aktuelle Entwicklungen</Text>
               {getUpdates().length > 0 ? (
                 getUpdates().map((update, idx) => (
                   <View
@@ -840,20 +837,13 @@ export function StartupPDFDocument({ startup, insight }: StartupPDFDocumentProps
                     </Text>
                     <View style={styles.updateContent}>
                       <Text style={styles.updateTitle}>
-                        {update.title || update.category || 'Update'}
+                        {update.title || update.category || 'Aktualisierung'}
                       </Text>
-                      {update.description && (
-                        <Text style={styles.updateDescription}>
-                          {update.description.length > 120
-                            ? update.description.substring(0, 120) + '...'
-                            : update.description}
-                        </Text>
-                      )}
                     </View>
                   </View>
                 ))
               ) : (
-                <Text style={styles.noData}>Keine aktuellen Updates verfügbar.</Text>
+                <Text style={styles.noData}>Keine aktuellen Entwicklungen verfügbar.</Text>
               )}
             </View>
           </View>
