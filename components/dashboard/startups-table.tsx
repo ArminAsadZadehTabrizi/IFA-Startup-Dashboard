@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useMemo, useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -10,6 +10,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import type { Startup, SDG } from "@/lib/types"
 import { formatRelativeTime, getStatusColor, getQualityColor } from "@/lib/utils"
 import { StartupDetailsModal } from "./startup-details-modal"
+import { DownloadReportButton } from "@/components/startup/download-report-button"
+import type { AIInsight } from "@/components/startup/ai-insights-section"
 
 interface StartupsTableProps {
   startups: Startup[]
@@ -35,6 +37,23 @@ export function StartupsTable({ startups, sdgs, filters, searchQuery }: Startups
   const [selectedContact, setSelectedContact] = useState<{ name: string; email?: string; phone?: string; title?: string } | null>(null)
   const [isContactModalOpen, setIsContactModalOpen] = useState(false)
   const [isStartupColumnFixed, setIsStartupColumnFixed] = useState(false)
+  const [insights, setInsights] = useState<AIInsight[]>([])
+
+  // Fetch AI insights for all startups
+  useEffect(() => {
+    async function fetchInsights() {
+      try {
+        const response = await fetch('/data/ai-insights.json')
+        if (response.ok) {
+          const data = await response.json()
+          setInsights(data.insights || [])
+        }
+      } catch {
+        // ignore
+      }
+    }
+    fetchInsights()
+  }, [])
 
   const filteredStartups = useMemo(() => {
     let result = [...startups]
@@ -342,6 +361,13 @@ export function StartupsTable({ startups, sdgs, filters, searchQuery }: Startups
                           </a>
                         </Button>
                       )}
+                      <DownloadReportButton
+                        startup={startup}
+                        insight={insights.find(i => i.startup_id === startup.id) || null}
+                        variant="ghost"
+                        size="sm"
+                        iconOnly
+                      />
                     </div>
                   </TableCell>
                 </TableRow>

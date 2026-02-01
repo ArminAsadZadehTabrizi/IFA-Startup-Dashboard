@@ -236,9 +236,9 @@ export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-full overflow-x-hidden">
       {/* Header Card */}
-      <Card className="border-purple-200 bg-gradient-to-br from-purple-50/50 to-blue-50/50">
+      <Card className="border-purple-200 bg-gradient-to-br from-purple-50/50 to-blue-50/50 max-w-full overflow-x-hidden">
         <div className="p-6">
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-3">
@@ -278,8 +278,8 @@ export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
 
           {/* AI Summary (GERMAN) */}
           {getAISummary() && (
-            <div className="bg-white/50 rounded-lg p-4 mb-4 max-h-32 overflow-y-auto">
-              <p className="text-sm text-gray-700 leading-relaxed">
+            <div className="bg-white/50 rounded-lg p-4 mb-4 max-h-40 overflow-y-auto">
+              <p className="text-sm text-gray-700 leading-relaxed break-words">
                 {getAISummary()}
               </p>
             </div>
@@ -302,7 +302,7 @@ export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
 
       {/* Sector Classification */}
       {insight.sector_classification && (
-        <Card className="border-blue-200 bg-blue-50/30">
+        <Card className="border-blue-200 bg-blue-50/30 max-w-full overflow-x-hidden">
           <div className="p-6">
             <div className="flex items-center gap-3 mb-4">
               <Target className="w-5 h-5 text-blue-600" />
@@ -320,7 +320,7 @@ export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
               </div>
               {insight.sector_classification.reasoning && (
                 <div className="bg-white rounded-lg p-4">
-                  <p className="text-sm text-gray-700 leading-relaxed">
+                  <p className="text-sm text-gray-700 leading-relaxed break-words">
                     <span className="font-medium">Begründung:</span> {insight.sector_classification.reasoning}
                   </p>
                 </div>
@@ -339,7 +339,7 @@ export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Strengths */}
           {getStrengths().length > 0 && (
-            <Card className="border-green-200 bg-green-50/30">
+            <Card className="border-green-200 bg-green-50/30 max-w-full overflow-x-hidden">
               <div className="p-5">
                 <div className="flex items-center gap-2 mb-3">
                   <CheckCircle2 className="w-5 h-5 text-green-600" />
@@ -359,7 +359,7 @@ export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
 
           {/* Concerns */}
           {getConcerns().length > 0 && (
-            <Card className="border-orange-200 bg-orange-50/30">
+            <Card className="border-orange-200 bg-orange-50/30 max-w-full overflow-x-hidden">
               <div className="p-5">
                 <div className="flex items-center gap-2 mb-3">
                   <AlertCircle className="w-5 h-5 text-orange-600" />
@@ -381,25 +381,25 @@ export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
 
       {/* Founders & LinkedIn Followers */}
       {insight.founders && insight.founders.length > 0 && (
-        <Card className="border-blue-200 bg-gradient-to-br from-blue-50/50 to-cyan-50/50">
+        <Card className="border-blue-200 bg-gradient-to-br from-blue-50/50 to-cyan-50/50 max-w-full overflow-x-hidden">
           <div className="p-5">
             <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
               <UserCircle2 className="w-5 h-5 text-blue-600" />
               Hauptgründer & LinkedIn-Follower
             </h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               {insight.founders.map((founder: any, idx: number) => (
                 <div
                   key={idx}
-                  className="bg-white rounded-lg p-4 border border-blue-100 hover:border-blue-300 transition-all hover:shadow-md"
+                  className="bg-white rounded-lg p-4 border border-blue-100 hover:border-blue-300 transition-all hover:shadow-md min-w-0"
                 >
                   <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1">
-                      <h5 className="font-semibold text-gray-900 text-sm mb-1">
+                    <div className="flex-1 min-w-0">
+                      <h5 className="font-semibold text-gray-900 text-sm mb-1 break-words">
                         {founder.name}
                       </h5>
                       {founder.role && (
-                        <p className="text-xs text-muted-foreground mb-2">
+                        <p className="text-xs text-muted-foreground mb-2 break-words">
                           {founder.role}
                         </p>
                       )}
@@ -436,9 +436,9 @@ export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
                       href={founder.linkedin_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-3 text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1 hover:underline"
+                      className="mt-3 text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1 hover:underline max-w-full overflow-hidden"
                     >
-                      <ExternalLink className="w-3 h-3" />
+                      <ExternalLink className="w-3 h-3 flex-shrink-0" />
                       LinkedIn-Profil öffnen
                     </a>
                   )}
@@ -455,7 +455,7 @@ export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
 
       {/* Business Metrics */}
       {insight.business_metrics && (
-        <Card>
+        <Card className="max-w-full overflow-x-hidden">
           <div className="p-5">
             <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
               <BarChart3 className="w-5 h-5 text-blue-600" />
@@ -565,7 +565,7 @@ export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
 
       {/* Updates Timeline */}
       {getUpdates().length > 0 && (
-        <Card>
+        <Card className="max-w-full overflow-x-hidden">
           <div className="p-5">
             <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-purple-600" />
@@ -575,16 +575,16 @@ export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
               {getUpdates().map((update: any, idx: number) => (
                 <div key={idx} className="border-l-2 border-purple-200 pl-4 pb-4 last:pb-0">
                   <div className="flex items-start justify-between gap-4 mb-2">
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         {update.verified && (
                           <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
                         )}
-                        <h5 className="font-medium text-gray-900 text-sm line-clamp-2">
+                        <h5 className="font-medium text-gray-900 text-sm line-clamp-2 break-words">
                           {update.title}
                         </h5>
                       </div>
-                      <p className="text-sm text-gray-600 mb-2 max-h-20 overflow-y-auto">
+                      <p className="text-sm text-gray-600 mb-2 max-h-20 overflow-y-auto break-words">
                         {update.description}
                       </p>
                       <div className="flex items-center gap-3 flex-wrap">
@@ -607,10 +607,10 @@ export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
                     href={update.source}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1 mt-2 hover:underline"
+                    className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1 mt-2 hover:underline max-w-full"
                   >
-                    <ExternalLink className="w-3 h-3" />
-                    <span className="truncate max-w-xs">{update.source}</span>
+                    <ExternalLink className="w-3 h-3 flex-shrink-0" />
+                    <span className="truncate">{update.source}</span>
                   </a>
                 </div>
               ))}
@@ -621,7 +621,7 @@ export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
 
       {/* Search Notes & Sources */}
       {(insight.search_notes || insight.sources_checked) && (
-        <Card className="border-blue-200 bg-blue-50/20">
+        <Card className="border-blue-200 bg-blue-50/20 max-w-full overflow-x-hidden">
           <div className="p-5">
             {insight.search_notes && (
               <div className="mb-4">
@@ -629,7 +629,7 @@ export function AIInsightsSection({ startupId }: AIInsightsSectionProps) {
                   <Search className="w-4 h-4 text-blue-600" />
                   <h5 className="text-sm font-semibold text-gray-900">Suchhinweise</h5>
                 </div>
-                <p className="text-sm text-gray-700 leading-relaxed">
+                <p className="text-sm text-gray-700 leading-relaxed break-words">
                   {insight.search_notes}
                 </p>
               </div>
