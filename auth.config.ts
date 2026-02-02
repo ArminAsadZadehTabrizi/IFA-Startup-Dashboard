@@ -2,6 +2,16 @@ import type { NextAuthConfig } from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
 
+// Public routes that don't require authentication
+const publicRoutes = [
+  "/login",
+  "/news",
+  "/unsubscribe",
+  "/api/news",
+  "/api/newsletter/subscribe",
+  "/api/newsletter/unsubscribe",
+]
+
 export const authConfig = {
   secret: process.env.NEXTAUTH_SECRET,
   pages: {
@@ -10,16 +20,23 @@ export const authConfig = {
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user
-      const isOnDashboard = nextUrl.pathname.startsWith("/dashboard") || nextUrl.pathname === "/"
-      const isOnLogin = nextUrl.pathname.startsWith("/login")
+      const pathname = nextUrl.pathname
 
-      if (isOnDashboard) {
-        if (isLoggedIn) return true
-        return false // Redirect unauthenticated users to login page
-      } else if (isOnLogin) {
-        if (isLoggedIn) return Response.redirect(new URL("/", nextUrl))
+      // Check if current route is public
+      const isOnPublicRoute = publicRoutes.some(route => pathname.startsWith(route))
+
+      // Allow access to public routes
+      if (isOnPublicRoute) {
+        return true
       }
-      return true
+
+      // Allow access if logged in
+      if (isLoggedIn) {
+        return true
+      }
+
+      // Redirect to login for protected routes
+      return false
     },
   },
   providers: [
