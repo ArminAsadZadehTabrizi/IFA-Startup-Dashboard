@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { NewsCard } from "@/components/news/news-card"
 import { NewsFilter } from "@/components/news/news-filter"
+import { NewsletterForm } from "@/components/newsletter-form"
 import type { NewsFeed, NewsCategory, NewsItem } from "@/lib/types-news"
 
 export default function NewsPage() {
@@ -218,6 +219,11 @@ export default function NewsPage() {
           totalNews={stats.total}
           onRefresh={loadNews}
         />
+        
+        {/* Newsletter Signup */}
+        <div className="max-w-xl">
+          <NewsletterForm />
+        </div>
         
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
