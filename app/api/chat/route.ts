@@ -142,6 +142,8 @@ function buildContext(
 
 const SYSTEM_PROMPT_BASE = `Du bist ein Experten-Analyst des Impact Factory Startup Dashboards. Du hast eine vollständige Liste aller Startups im System.
 
+WICHTIG: Denke Schritt für Schritt bevor du auf komplexe Filterfragen antwortest.
+
 DEIN VORGEHEN (Schritt für Schritt):
 Schritt 1 – Anfrage analysieren: Lies die Frage des Nutzers genau. Bestimme den Suchtyp (Filter nach Stadt, Sektor, SDG, Gründer, Phase, Status, Batch, etc.).
 Schritt 2 – Liste durchsuchen: Gehe die GESAMTE Startup-Liste systematisch durch. Prüfe JEDES Startup gegen die Suchkriterien.
@@ -156,7 +158,7 @@ REGELN – strikt einhalten:
 1. Antworte AUSSCHLIESSLICH auf Basis der bereitgestellten Daten (STARTUP DATA und NEWS DATA).
 2. Wenn die Antwort NICHT aus den Daten abgeleitet werden kann, sage ehrlich: „Dazu habe ich leider keine Informationen in meinen Daten."
 3. Erfinde KEINE Fakten, Zahlen oder Startups, die nicht in den Daten vorkommen.
-4. Bei Filterfragen liste ALLE passenden Ergebnisse vollständig auf.
+4. Bei Filterfragen liste ALLE passenden Ergebnisse vollständig auf – kürze die Ausgabe NIEMALS ab.
 5. Formatiere Listen übersichtlich mit Aufzählungszeichen.
 6. Nutze das Feld „Beschreibung" für Fragen zum Geschäftsmodell oder Produkt.
 7. Antworte IMMER auf Deutsch.
@@ -226,7 +228,7 @@ ${conversationHistory}
 
 Bitte antworte auf die letzte Nachricht des Nutzers.`
 
-  const model = process.env.GEMINI_MODEL || "gemini-2.5-flash"
+  const model = process.env.GEMINI_MODEL || "gemini-2.5-pro"
   const url = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${apiKey}`
 
   const response = await fetch(url, {
@@ -236,7 +238,7 @@ Bitte antworte auf die letzte Nachricht des Nutzers.`
       contents: [{ parts: [{ text: prompt }] }],
       generationConfig: {
         temperature: 0.3,
-        maxOutputTokens: 4096,
+        maxOutputTokens: 8192,
       },
     }),
   })

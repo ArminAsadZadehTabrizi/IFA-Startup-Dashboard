@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { MessageCircle, X, Send, Loader2, AlertCircle } from "lucide-react"
+import { MessageCircle, X, Send, Loader2, AlertCircle, Square } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
@@ -31,7 +31,9 @@ export function Chatbot() {
   const [isLoading, setIsLoading] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
-  
+  const abortControllerRef = useRef<AbortController | null>(null)
+  const lastInputRef = useRef<string>("")
+
   const { remainingQuestions, isLimitReached, canSendMessage, incrementUsage, dailyLimit } =
     useChatRateLimit()
 
@@ -51,7 +53,7 @@ export function Chatbot() {
 
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isLoading) return
-    
+
     // Check rate limit
     if (!canSendMessage()) {
       const errorMessage: ChatMessage = {
@@ -64,6 +66,13 @@ export function Chatbot() {
       return
     }
 
+    // Cancel any previous running request
+    abortControllerRef.current?.abort()
+
+    // Create new controller
+    const controller = new AbortController()
+    abortControllerRef.current = controller
+
     const userMessage: ChatMessage = {
       id: Date.now().toString(),
       role: "user",
@@ -72,9 +81,10 @@ export function Chatbot() {
     }
 
     setMessages((prev) => [...prev, userMessage])
+    lastInputRef.current = inputValue  // Save input before clearing
     setInputValue("")
     setIsLoading(true)
-    
+
     // Increment usage counter
     incrementUsage()
 
@@ -88,6 +98,7 @@ export function Chatbot() {
           message: inputValue,
           history: messages.slice(-5), // Send last 5 messages for context
         }),
+        signal: controller.signal,
       })
 
       const data = await response.json()
@@ -106,11 +117,17 @@ export function Chatbot() {
 
       setMessages((prev) => [...prev, assistantMessage])
     } catch (error) {
+      // Handle abort separately
+      if (error instanceof Error && error.name === "AbortError") {
+        // Request was aborted - do nothing, handleStop already added the message
+        return
+      }
+
       console.error("Chat error:", error)
-      
+
       // Extract error message if available
       const errorText = error instanceof Error ? error.message : "Unknown error"
-      
+
       const errorMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
@@ -122,8 +139,26 @@ export function Chatbot() {
       }
       setMessages((prev) => [...prev, errorMessage])
     } finally {
+      abortControllerRef.current = null
       setIsLoading(false)
     }
+  }
+
+  const handleStop = () => {
+    abortControllerRef.current?.abort()
+    abortControllerRef.current = null
+    setIsLoading(false)
+
+    // Restore the input text
+    setInputValue(lastInputRef.current)
+
+    const stoppedMessage: ChatMessage = {
+      id: Date.now().toString(),
+      role: "assistant",
+      content: "Generierung abgebrochen.",
+      timestamp: new Date(),
+    }
+    setMessages((prev) => [...prev, stoppedMessage])
   }
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -178,7 +213,7 @@ export function Chatbot() {
                 </AlertDescription>
               </Alert>
             )}
-            
+
             {isLimitReached && (
               <Alert className="bg-red-50 border-red-200">
                 <AlertCircle className="h-4 w-4 text-red-600" />
@@ -187,7 +222,7 @@ export function Chatbot() {
                 </AlertDescription>
               </Alert>
             )}
-            
+
             {messages.map((message) => (
               <div
                 key={message.id}
@@ -236,23 +271,31 @@ export function Chatbot() {
                 disabled={isLoading}
                 className="flex-1"
               />
-              <Button
-                onClick={handleSendMessage}
-                disabled={isLoading || !inputValue.trim() || isLimitReached}
-                size="icon"
-                title={
-                  isLimitReached
-                    ? "Tageslimit erreicht"
-                    : `${remainingQuestions} Fragen übrig`
-                }
-              >
-                {isLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
+              {isLoading ? (
+                <Button
+                  onClick={handleStop}
+                  size="icon"
+                  variant="destructive"
+                  title="Generierung abbrechen"
+                >
+                  <Square className="h-4 w-4" />
+                  <span className="sr-only">Stoppen</span>
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleSendMessage}
+                  disabled={!inputValue.trim() || isLimitReached}
+                  size="icon"
+                  title={
+                    isLimitReached
+                      ? "Tageslimit erreicht"
+                      : `${remainingQuestions} Fragen übrig`
+                  }
+                >
                   <Send className="h-4 w-4" />
-                )}
-                <span className="sr-only">Senden</span>
-              </Button>
+                  <span className="sr-only">Senden</span>
+                </Button>
+              )}
             </div>
           </div>
         </Card>
