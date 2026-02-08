@@ -33,121 +33,83 @@ async function fetchStartupData() {
 }
 
 // ---------------------------------------------------------------------------
-// 2. Context Formatting Helpers  (token-efficient plain text)
+// 2. Context Formatting  (token-efficient – only fields useful for queries)
 // ---------------------------------------------------------------------------
 
 /**
- * Converts the raw startups array + AI insights into a compact text block.
- * Focuses on fields useful for answering user questions:
- *   Name, Sector, SDGs, City/State, Batch, Programme Phase, Status,
- *   Description (truncated), Founders.
- * Technical IDs, quality metadata, timestamps etc. are stripped out.
+ * Converts startups + AI insights into a compact, token-efficient text block.
+ * Only the fields that matter for user queries are included:
+ *   Name, Sector, City, SDGs, Batch, Phase, Status, Founders, Short Description.
+ * Heavy fields (IDs, timestamps, HTML, quality metadata) are stripped.
  */
-function formatStartupsForContext(
+function formatStartupsForAI(
   startups: any[],
-  insights: any[]
+  aiInsights: any[] = []
 ): string {
-  const insightsMap = new Map<string, any>()
-  for (const i of insights) {
-    if (i.startup_id) insightsMap.set(i.startup_id, i)
+  // Pre-index founder names from AI insights for fast lookup
+  const foundersMap = new Map<string, string>()
+  for (const insight of aiInsights) {
+    if (!insight.startup_id) continue
+    const names: string[] = []
+    if (Array.isArray(insight.founders)) {
+      for (const f of insight.founders) {
+        if (typeof f === "string") names.push(f)
+        else if (f?.name) names.push(f.name)
+      }
+    }
+    if (names.length > 0) {
+      foundersMap.set(insight.startup_id, names.join(", "))
+    }
   }
 
   const lines = startups.map((s: any) => {
-    const parts: string[] = []
+    // Short description: prefer official > latest > top-level, strip HTML
+    const rawDesc =
+      s.official?.description || s.latest?.description || s.description || ""
+    const shortDesc = rawDesc
+      .replace(/<[^>]*>/g, "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .substring(0, 150)
 
-    // Core fields
-    parts.push(s.name || "–")
-    parts.push(s.sector || "–")
-    parts.push(`SDG ${s.sdgs?.join(", ") || "–"}`)
-    parts.push(`${s.city || "–"}, ${s.state || "–"}`)
-    parts.push(s.batch || "–")
-    parts.push(s.programPhase || "–")
-    parts.push(s.status || "–")
+    // Founders: AI insights > primaryContact name
+    const founders =
+      foundersMap.get(s.id) || s.primaryContact?.name || "–"
 
-    // Description – prefer official > latest > top-level, truncated
-    const desc =
-      s.official?.description || s.latest?.description || s.description
-    if (desc) {
-      parts.push(
-        `Beschreibung: ${desc.substring(0, 200).replace(/\n/g, " ").trim()}`
-      )
-    }
-
-    // Primary contact (name + role only, no raw emails/phones)
-    if (s.primaryContact?.name) {
-      let contact = s.primaryContact.name
-      if (s.primaryContact.title) contact += ` (${s.primaryContact.title})`
-      parts.push(`Kontakt: ${contact}`)
-    }
-
-    // AI Insights – founders & german summary
-    const insight = insightsMap.get(s.id)
-    if (insight) {
-      // Founders
-      const founders = extractFounders(insight)
-      if (founders) parts.push(`Gründer: ${founders}`)
-
-      // German summary from AI enrichment (compact)
-      if (insight.german_summary) {
-        const summary = insight.german_summary
-          .substring(0, 200)
-          .replace(/\n/g, " ")
-          .trim()
-        parts.push(`Info: ${summary}`)
-      }
-    }
-
-    return parts.join(" | ")
+    return [
+      s.name || "–",
+      s.sector || "–",
+      s.city || "–",
+      `SDG ${s.sdgs?.join(",") || "–"}`,
+      s.batch || "–",
+      s.programPhase || "–",
+      s.status || "–",
+      `Gründer: ${founders}`,
+      shortDesc ? `Beschreibung: ${shortDesc}` : "",
+    ]
+      .filter(Boolean)
+      .join(" | ")
   })
 
   return [
     `Anzahl Startups: ${startups.length}`,
-    "Format: Name | Sektor | SDGs | Ort | Batch | Programmphase | Status | Beschreibung | Kontakt | Gründer | Info",
+    "Format: Name | Sektor | Stadt | SDGs | Batch | Phase | Status | Gründer | Beschreibung",
     "",
     ...lines,
   ].join("\n")
 }
 
-/** Extract a readable founders string from an AI insight record. */
-function extractFounders(insight: any): string | null {
-  const raw =
-    insight.founders ||
-    insight.team_info ||
-    insight.business_metrics?.team_members
-  if (!raw) return null
-
-  const names: string[] = []
-
-  if (typeof raw === "string") {
-    names.push(raw)
-  } else if (Array.isArray(raw)) {
-    for (const f of raw) {
-      if (typeof f === "string") names.push(f)
-      else if (f?.name) names.push(f.name + (f.role ? ` (${f.role})` : ""))
-      else if (f?.founder_name) names.push(f.founder_name)
-    }
-  } else if (typeof raw === "object" && raw.name) {
-    names.push(raw.name)
-  }
-
-  return names.length > 0 ? names.join(", ") : null
-}
-
 /**
- * Converts the raw news-feed items into a compact text block.
- * Includes: Date, Startup Name, Headline, Summary snippet.
+ * Converts news-feed items into a compact text block.
  */
 function formatNewsForContext(newsItems: any[]): string {
   if (!newsItems || newsItems.length === 0) return "Keine News vorhanden."
 
-  const lines = newsItems.map((n: any) => {
+  const lines = newsItems.slice(0, 30).map((n: any) => {
     const date = n.date || "–"
     const startup = n.startup_name || "–"
     const headline = n.headline || "–"
-    const summary = n.summary
-      ? n.summary.substring(0, 200).replace(/\n/g, " ").trim()
-      : ""
-    return `${date} – ${startup}: ${headline}${summary ? ` | ${summary}` : ""}`
+    return `${date} – ${startup}: ${headline}`
   })
 
   return [`Anzahl News: ${newsItems.length}`, "", ...lines].join("\n")
@@ -162,7 +124,7 @@ function buildContext(
   aiInsights: any[],
   newsItems: any[]
 ): string {
-  const startupBlock = formatStartupsForContext(startups, aiInsights)
+  const startupBlock = formatStartupsForAI(startups, aiInsights)
   const newsBlock = formatNewsForContext(newsItems)
 
   return [
@@ -178,16 +140,26 @@ function buildContext(
 // 4. System Prompt (shared base – used by both providers)
 // ---------------------------------------------------------------------------
 
-const SYSTEM_PROMPT_BASE = `Du bist der KI-Assistent des Impact Factory Startup Dashboards. Du bist freundlich, professionell und antwortest immer auf Deutsch.
+const SYSTEM_PROMPT_BASE = `Du bist ein Experten-Analyst des Impact Factory Startup Dashboards. Du hast eine vollständige Liste aller Startups im System.
 
-REGELN – bitte strikt einhalten:
-1. Beantworte Fragen AUSSCHLIESSLICH auf Basis der unten bereitgestellten Daten (STARTUP DATA und NEWS DATA).
-2. Wenn die Antwort NICHT aus den bereitgestellten Daten abgeleitet werden kann, sage ehrlich: „Dazu habe ich leider keine Informationen in meinen Daten."
+DEIN VORGEHEN (Schritt für Schritt):
+Schritt 1 – Anfrage analysieren: Lies die Frage des Nutzers genau. Bestimme den Suchtyp (Filter nach Stadt, Sektor, SDG, Gründer, Phase, Status, Batch, etc.).
+Schritt 2 – Liste durchsuchen: Gehe die GESAMTE Startup-Liste systematisch durch. Prüfe JEDES Startup gegen die Suchkriterien.
+  • Bei Suche nach „weiblichen Gründerinnen" / „Gründerinnen": Prüfe die Vornamen im Feld „Gründer" auf typisch weibliche Vornamen.
+  • Bei Ortssuche: Vergleiche mit dem Feld „Stadt".
+  • Bei Sektorsuche: Vergleiche mit dem Feld „Sektor".
+  • Bei SDG-Suche: Vergleiche mit dem Feld „SDGs".
+  • Bei Phasensuche: Vergleiche mit dem Feld „Phase" (Early, Growth, Scale, Community, Alumni, etc.).
+Schritt 3 – Ergebnis ausgeben: Liste ALLE passenden Startups auf – nicht nur die ersten paar.
+
+REGELN – strikt einhalten:
+1. Antworte AUSSCHLIESSLICH auf Basis der bereitgestellten Daten (STARTUP DATA und NEWS DATA).
+2. Wenn die Antwort NICHT aus den Daten abgeleitet werden kann, sage ehrlich: „Dazu habe ich leider keine Informationen in meinen Daten."
 3. Erfinde KEINE Fakten, Zahlen oder Startups, die nicht in den Daten vorkommen.
-4. Bei Filterfragen (z.B. nach Stadt, Bundesland, Sektor, SDG) liste ALLE passenden Ergebnisse auf.
+4. Bei Filterfragen liste ALLE passenden Ergebnisse vollständig auf.
 5. Formatiere Listen übersichtlich mit Aufzählungszeichen.
-6. Die Programmphase kann sein: Early, Growth, Scale, Community, Alumni, etc. – nutze das Feld „Programmphase" für entsprechende Fragen.
-7. Nutze das Feld „Beschreibung" bzw. „Info" für Fragen zum Geschäftsmodell oder Produkt.
+6. Nutze das Feld „Beschreibung" für Fragen zum Geschäftsmodell oder Produkt.
+7. Antworte IMMER auf Deutsch.
 `
 
 function buildSystemPrompt(context: string): string {
@@ -220,8 +192,8 @@ async function callOpenAI(messages: ChatMessage[], context: string) {
     body: JSON.stringify({
       model: process.env.OPENAI_MODEL || "gpt-4o-mini",
       messages: [systemMessage, ...messages],
-      temperature: 0.4,
-      max_tokens: 1500,
+      temperature: 0.3,
+      max_tokens: 4096,
     }),
   })
 
@@ -263,8 +235,8 @@ Bitte antworte auf die letzte Nachricht des Nutzers.`
     body: JSON.stringify({
       contents: [{ parts: [{ text: prompt }] }],
       generationConfig: {
-        temperature: 0.4,
-        maxOutputTokens: 2048,
+        temperature: 0.3,
+        maxOutputTokens: 4096,
       },
     }),
   })
