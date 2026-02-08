@@ -62,6 +62,9 @@ function formatStartupsForAI(
     }
   }
 
+  // Startups participating in both IFI and IFA programs
+  const dualBatchStartups = ["CHARGEUNITY", "NUNOS", "Plastic Fischer", "social products 4 all"]
+
   const lines = startups.map((s: any) => {
     // Short description: prefer official > latest > top-level, strip HTML
     const rawDesc =
@@ -76,12 +79,18 @@ function formatStartupsForAI(
     const founders =
       foundersMap.get(s.id) || s.primaryContact?.name || "–"
 
+    // Batch: append IFA Batch 1 for dual-program startups
+    let batch = s.batch || "–"
+    if (dualBatchStartups.includes(s.name)) {
+      batch = `${batch}, IFA Batch 1`
+    }
+
     return [
       s.name || "–",
       s.sector || "–",
       s.city || "–",
       `SDG ${s.sdgs?.join(",") || "–"}`,
-      s.batch || "–",
+      batch,
       s.programPhase || "–",
       s.status || "–",
       `Gründer: ${founders}`,
